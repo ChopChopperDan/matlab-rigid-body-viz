@@ -18,15 +18,13 @@ function robot = updateRobot(theta, robot)
             R = R*rot(robot.kin.H(:,i),theta(i));
             robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
             p = p + R*robot.kin.P(:,i+1);
-        elseif robot.kin.type(i) == 1 % prismatic
+        elseif robot.kin.type(i) == 1 || robot.kin.type(i) == 3 % prismatic
             p = p + R*robot.kin.H(:,i)*theta(i);
             robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
-            robot.frame(i+1) = actuatePrismaticJoint(theta(i), ...
-                                robot.kin.H(:,i),robot.frame(i+1));
-            p = p + R*robot.kin.P(:,i+1);
-        elseif robot.kin.type(i) == 3 % translational (mobile robot)
-            p = p + R*robot.kin.H(:,i)*theta(i);
-            robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
+            if robot.kin.type(i) == 1 
+                robot.frame(i+1) = actuatePrismaticJoint(theta(i), ...
+                                    robot.kin.H(:,i),robot.frame(i+1));
+            end
             p = p + R*robot.kin.P(:,i+1);
         end
     end
