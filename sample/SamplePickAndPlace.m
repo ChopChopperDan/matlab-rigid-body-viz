@@ -52,7 +52,6 @@ simple_robot.gripper.R0 = rot(y0,pi/2)*rot(z0,pi/2);
 %%%%%% Create Environment %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure(1);
-opengl('software');
 h_robot = createRobot(simple_robot,'CreateFrames','on');
 axis equal;
 axis([-3.5 3.5 -3.5 3.5 -1 1]);
@@ -66,9 +65,6 @@ load.labels = attachPrefix('load_', load.labels);
 
 %% Animate robot with joint displacements
 
-vidObj = VideoWriter('PickAndPlace.mp4');
-open(vidObj);
-
 % timestepping
 t = 0:0.033:1;
 
@@ -80,8 +76,6 @@ q2 = 0*t;
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
-    currFrame = getframe;
-    writeVideo(vidObj,currFrame);
 end
 
 % grab object
@@ -97,8 +91,6 @@ q2 = q2(end)-3*pi/4*t;
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
-    currFrame = getframe;
-    writeVideo(vidObj,currFrame);
 end
 
 % release object
@@ -111,8 +103,4 @@ q2 = q2(end) - q2(end)*t;
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
-    currFrame = getframe;
-    writeVideo(vidObj,currFrame);
 end
-
-close(vidObj);
