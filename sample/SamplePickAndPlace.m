@@ -1,3 +1,9 @@
+% Creation and Functionality of a custom-defined robot
+% This is a sample script to demonstrate the functionality for the 3D
+% drawing package for robot visualization.  In this example, we create a
+% custom robot and an object within the workspace.  The robot is then told
+% to execute a pick-and-place motion to grab the object and position it
+% somewhere else.
 
 clear all; close all;
 
@@ -16,7 +22,7 @@ simple_robot.origin = [eye(3) zed; zed' 1];
 %            2 for cuboid link
 simple_robot.link_type = [0 1 1];
 
-% Rigid Body dimensions
+% link dimensions
 simple_robot.link(2).radius = 0.2;
 simple_robot.link(2).height = 1.6;
 simple_robot.link(2).R0 = rot(y0,pi/2);
@@ -46,12 +52,13 @@ simple_robot.gripper.R0 = rot(y0,pi/2)*rot(z0,pi/2);
 %%%%%% Create Environment %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure(1);
+opengl('software');
 h_robot = createRobot(simple_robot,'CreateFrames','on');
 axis equal;
 axis([-3.5 3.5 -3.5 3.5 -1 1]);
 view([0 90])
 
-% place object in world space
+% place object in world
 load_param.radius = 0.19;
 load = createEllipsoid(eye(3),[0;3.25;0],load_param,'FaceColor',[0;1;1]);
 load.labels = attachPrefix('load_', load.labels);
@@ -59,36 +66,53 @@ load.labels = attachPrefix('load_', load.labels);
 
 %% Animate robot with joint displacements
 
-t = 0:0.01:1;
-d = zeros(length(t));
+vidObj = VideoWriter('PickAndPlace.mp4');
+open(vidObj);
 
+% timestepping
+t = 0:0.033:1;
+
+% pre-defined robot motion
 q1 = pi/2*t;
 q2 = 0*t;
 
+% Move robot end effector towards object
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
-    d(k) = norm(h_robot.frame(end).t - load.t);
+    currFrame = getframe;
+    writeVideo(vidObj,currFrame);
 end
 
-if norm(h_robot.frame(end).t - load.t) <= 0.25
+% grab object
+if norm(h_robot.frame(end).t - load.t) <= 0.5
     h_robot = graspLoad(load,h_robot);
 end
 
+% pre-defined robot motion
 q1 = q1(end)-pi*t;
 q2 = q2(end)-3*pi/4*t;
 
+% move robot to desired new location
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
+    currFrame = getframe;
+    writeVideo(vidObj,currFrame);
 end
 
+% release object
 [h_robot, load] = releaseLoad(h_robot);
 
+% return robot to zero position
 q1 = q1(end) - q1(end)*t;
 q2 = q2(end) - q2(end)*t;
 
 for k=1:length(t)
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
+    currFrame = getframe;
+    writeVideo(vidObj,currFrame);
 end
+
+close(vidObj);

@@ -1,6 +1,8 @@
-% This is a test script to demonstrate some simple functionality of the 3D
-% drawing package.  This script defines a RP planar robot, and has it
-% animate a simple prescribed path
+% Creation of a custom-defined robot.  
+% This is a sample script to demonstrate some simple functionality of the 
+% 3D drawing package for robot visualization.  This script defines a RP 
+% (revolute-prismatic) planar robot, and has it follow a simple 
+% prescribed path.
 
 clear all; close all;
 
@@ -23,7 +25,7 @@ simple_robot.link_type = [0 1 1];
 link_props = {'FaceColor', [0;1;0],'EdgeAlpha', 0};
 joint_props = {'FaceColor', [1;0;0]};
 
-% Rigid Body dimensions
+% link dimensions
 simple_robot.link(2).radius = 0.2;
 simple_robot.link(2).height = 1.8;
 simple_robot.link(2).R0 = rot(y0,pi/2);
@@ -45,9 +47,11 @@ simple_robot.joint(2).height = 0.2;
 simple_robot.joint(2).sliderscale = 0.8;
 simple_robot.joint(2).props = {}; % Keep shape defaults
 
+% Define frames
 simple_robot.frame.scale = 0.4;
 simple_robot.frame.width = 0.05;
 
+% Define gripper
 simple_robot.gripper.width = 0.4;
 simple_robot.gripper.height = 0.25;
 simple_robot.gripper.R0 = rot(y0,pi/2)*rot(z0,pi/2);
