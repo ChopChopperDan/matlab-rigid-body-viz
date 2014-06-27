@@ -14,6 +14,8 @@ function [robot, object] = removeObjectFromRobot(label, frame, robot)
     % returns:
     %       handle to updated robot structure 
     %       handle to removed object
+    %
+    % see also DELETEBODIES ATTACHOBJECTTOROBOT
     
     hits = [];
     

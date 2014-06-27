@@ -195,7 +195,6 @@ function handle = createRobot(robot,varargin)
     if strcmpi(cg,'on')
         RT = R*robot.gripper.R0;
         handle.end_effector = createParallelJawGripper(RT,p,robot.gripper);
-        handle.end_effector.gripper_info.RT = robot.gripper.R0;
     else
         handle.end_effector = [];
     end
