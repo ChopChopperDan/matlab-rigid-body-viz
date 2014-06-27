@@ -1,39 +1,49 @@
-%
-% h_p = createRobot(robot,...)
-%
-% purpose: creates a robot drawing object in zero configuration
-%
-% input:
-% robot struct with parts:
-%       type: 0 = rotational  1 = prismatic 
-%             2 = rotational (for mobile) 3 = translational (for mobile)
-%       H = [ h1 h2 ... hn ] axis of rotation or translation
-%       P = [p01 p12 p23 .. p_{n-1}n ] inter-link vectors
-%       n: # of links (>1)
-%       origin: 4 x 4 transformation matrix denoting base frame
-%       joint: n dimensional struct with parameters describing each joint
-%       link_type: n+1 dimensional vector describing each type of link
-%               0 = no link
-%               1 = cylindrical link
-%               2 = cuboid link
-%       link: n+1 dimensional struct with parameters describing each link
-%       [opt] frame: parameters describing coordinate frames, if drawn
-%       [opt] gripper: parameters describing the gripper, if drawn
-%
-% Optional Additional Properties:
-%       'CreateFrames'          default: 'off'
-%       'CreateGripper'         default: 'on'
-% 
-% depends on the following drawing package files:
-%       createCuboid.m
-%       createCylinder.m
-%       createParallelJawGripper.m
-%       create3DFrame.m
-%       attachPrefix.m
-%
-% returns handle to robot drawing object
-%
 function handle = createRobot(robot,varargin)
+    %
+    % handle = createRobot(robot,...)
+    %
+    % purpose: creates a robot drawing object in zero configuration
+    %
+    % input:
+    % robot struct with parts:
+    %       type:   0 = rotational  1 = prismatic 
+    %               2 = rotational (for mobile) 
+    %               3 = translational (for mobile)
+    %       H = [ h1 h2 ... hn ] axis of rotation or translation
+    %       P = [p01 p12 p23 .. p_{n-1}n ] inter-link vectors
+    %       n: # of joints 
+    %       origin: 4 x 4 transformation matrix denoting base frame
+    %       joint: n dimensional struct with parameters 
+    %                   describing each joint
+    %           rotational joint: radius, height
+    %           prismatic joint:  width, length, height *NOTE: HEIGHT IS
+    %                   ASSUMED TO BE MAXIMUM DISPLACEMENT FOR JOINT
+    %           'mobile' joints: can be empty, will not be drawn
+    %       link_type: n + 1 dimensional vector describing 
+    %                   each type of link
+    %               0 = no link
+    %               1 = cylindrical link
+    %               2 = cuboid link
+    %       link: n + 1 dimensional struct with parameters 
+    %               describing each link
+    %       [opt] frame: parameters describing coordinate frames, if drawn
+    %       [opt] gripper: parameters describing the gripper, if drawn
+    %
+    % Optional Additional Properties:
+    %       'CreateFrames'          default: 'off'
+    %       'CreateGripper'         default: 'on'
+    % 
+    % depends on the following drawing package files:
+    %       createCuboid.m
+    %       createCylinder.m
+    %       createParallelJawGripper.m
+    %       create3DFrame.m
+    %       attachPrefix.m
+    %
+    % returns handle to robot drawing object
+    %
+    % see also UPDATEROBOT
+
     % Walk through varargin
     for i=1:2:(nargin-1)
         if strcmp(varargin{i},'CreateFrames')
@@ -48,8 +58,7 @@ function handle = createRobot(robot,varargin)
     if ~exist('cf','var'); cf = 'off'; end
     if ~exist('cg','var'); cg = 'on'; end
     
-    
-    % Default axis for most geometric primitives
+    % Default actuation axis for joints
     z0 = [0;0;1];
     
     % Parse out the robot object
@@ -68,9 +77,11 @@ function handle = createRobot(robot,varargin)
         R0 = robot.link(1).R0;
         t0 = p + robot.link(1).t0;
         if robot.link_type(1) == 1
-            link = createCylinder(R0, t0, robot.link(1), robot.link(1).props{:});
+            link = createCylinder(R0, t0, ...
+                    robot.link(1), robot.link(1).props{:});
         elseif robot.link_type(1) == 2
-            link = createCuboid(R0, t0, robot.link(1), robot.link(1).props{:});
+            link = createCuboid(R0, t0, ...
+                    robot.link(1), robot.link(1).props{:});
         end
     else
         link.bodies = [];
@@ -100,23 +111,39 @@ function handle = createRobot(robot,varargin)
             Rj = rot(hat(z0)*h,phi);
         end
         
-        if handle.kin.type(i) == 0 % rotational
-            joint = createCylinder(Rj, p, robot.joint(i), robot.joint(i).props{:});
-        elseif handle.kin.type(i) == 1 % prismatic
-            joint = createPrismaticJoint(Rj, p, robot.joint(i), robot.joint(i).props{:});
-        elseif handle.kin.type(i) == 2 || handle.kin.type(i) == 3 % (mobile robot)
-            joint.bodies = [];
-            joint.labels = {};
-        end
-        handle.frame(i+1).bodies = joint.bodies;
-        handle.frame(i+1).labels = ...
+        if handle.kin.type(i) == 0 
+            % rotational
+            joint = createCylinder(Rj, p, ...
+                            robot.joint(i), robot.joint(i).props{:});
+            handle.frame(i+1).bodies = joint.bodies;
+            handle.frame(i+1).labels = ...
                 attachPrefix(['joint' num2str(i) '_'],joint.labels);
-        
+        elseif handle.kin.type(i) == 1 
+            % prismatic
+            joint = createPrismaticJoint(Rj, p, ...
+                            robot.joint(i), robot.joint(i).props{:});
+            joint.labels = attachPrefix(['joint' num2str(i) '_'], ...
+                                joint.labels);
+            % attach body to previous frame
+            handle.frame(i).bodies = [handle.frame(i).bodies ...
+                                    joint.bodies(1)];
+            handle.frame(i).labels = [handle.frame(i).labels ...
+                                    joint.labels(1)];
+            % attach slider to current frame
+            handle.frame(i+1).bodies = joint.bodies(2);
+            handle.frame(i+1).labels = joint.labels(2);
+        elseif handle.kin.type(i) == 2 || handle.kin.type(i) == 3
+            % mobile 'joints' aren't drawn
+            handle.frame(i+1).bodies = [];
+            handle.frame(i+1).labels = {};
+        end
         
         % If drawing coordinate frames, draw one at joint i
-        if strcmpi(cf,'on') && handle.kin.type(i) ~=2 && handle.kin.type(i) ~= 3
+        if strcmpi(cf,'on') && ...
+                handle.kin.type(i) ~=2 && handle.kin.type(i) ~= 3
             frame = create3DFrame(R, p, robot.frame);
-            handle.frame(i+1).bodies = [handle.frame(i+1).bodies frame.bodies];
+            handle.frame(i+1).bodies = ...
+                [handle.frame(i+1).bodies frame.bodies];
             handle.frame(i+1).labels = ...
                 [handle.frame(i+1).labels ...
                     attachPrefix(['frame' num2str(i) '_'],frame.labels)];
@@ -127,9 +154,11 @@ function handle = createRobot(robot,varargin)
             R0 = R*robot.link(i+1).R0;
             t0 = p + R*robot.link(i+1).t0;
             if robot.link_type(i+1) == 1
-                link = createCylinder(R0, t0, robot.link(i+1), robot.link(i+1).props{:});
+                link = createCylinder(R0, t0, ...
+                                robot.link(i+1), robot.link(i+1).props{:});
             elseif robot.link_type(i+1) == 2
-                link = createCuboid(R0, t0, robot.link(i+1), robot.link(i+1).props{:});
+                link = createCuboid(R0, t0, ...
+                                robot.link(i+1), robot.link(i+1).props{:});
             end
         else
             link.bodies = [];

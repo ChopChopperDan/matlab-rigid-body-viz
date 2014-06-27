@@ -6,6 +6,11 @@
 
 clear all; close all;
 
+% Add path to drawing library if not already included
+if isempty(strfind(path, 'matlab-rigid-body-viz'))
+    addpath('../../matlab-rigid-body-viz/src');
+end
+
 x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
 
 % Kinematics
@@ -27,23 +32,24 @@ joint_props = {'FaceColor', [1;0;0]};
 
 % link dimensions
 simple_robot.link(2).radius = 0.2;
-simple_robot.link(2).height = 1.8;
+simple_robot.link(2).height = 1.3;
 simple_robot.link(2).R0 = rot(y0,pi/2);
-simple_robot.link(2).t0 = 1.1*x0;
+simple_robot.link(2).t0 = 0.85*x0;
 simple_robot.link(2).props = link_props;
 
 simple_robot.link(3).radius = 0.1;
-simple_robot.link(3).height = 0.8;
+simple_robot.link(3).height = 0.5;
 simple_robot.link(3).R0 = rot(y0,pi/2);
-simple_robot.link(3).t0 = 0.6*x0;
+simple_robot.link(3).t0 = 0.75*x0;
 simple_robot.link(3).props = {}; % Keep shape defaults
 
 simple_robot.joint(1).radius = 0.2;
 simple_robot.joint(1).height = 0.4;
 simple_robot.joint(1).props = joint_props;
+
 simple_robot.joint(2).width = 0.3;
 simple_robot.joint(2).length = 0.3;
-simple_robot.joint(2).height = 0.2;
+simple_robot.joint(2).height = 1;
 simple_robot.joint(2).sliderscale = 0.8;
 simple_robot.joint(2).props = {}; % Keep shape defaults
 
@@ -67,7 +73,7 @@ axis([-3.5 3.5 -3.5 3.5 -1 1]);
 t = 0:0.005:1;
 
 q1 = 2*pi*t;
-q2 = 0.5*(1 - 1*cos(2*pi*t));
+q2 = simple_robot.joint(2).height*(1 - cos(2*pi*t))/2;
 timestamps = zeros(1,length(t));
 
 for k=1:length(t)

@@ -8,6 +8,8 @@ function robot = updateRobot(theta, robot)
     % depends on updateRigidBody.m
     %
     % returns updated robot drawing structure
+    %
+    % see also UPDATERIGIDBODY CREATEROBOT
     
     % compute forward kinematics and update bodies at each joint's frame
     R = eye(3);
@@ -16,17 +18,11 @@ function robot = updateRobot(theta, robot)
     for i=1:n
         if robot.kin.type(i) == 0 || robot.kin.type(i) == 2 % rotational
             R = R*rot(robot.kin.H(:,i),theta(i));
-            robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
-            p = p + R*robot.kin.P(:,i+1);
         elseif robot.kin.type(i) == 1 || robot.kin.type(i) == 3 % prismatic
             p = p + R*robot.kin.H(:,i)*theta(i);
-            robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
-            if robot.kin.type(i) == 1 
-                robot.frame(i+1) = actuatePrismaticJoint(theta(i), ...
-                                    robot.kin.H(:,i),robot.frame(i+1));
-            end
-            p = p + R*robot.kin.P(:,i+1);
         end
+        robot.frame(i+1) = updateRigidBody(R,p,robot.frame(i+1));
+        p = p + R*robot.kin.P(:,i+1);
     end
     % Update tool frame
     robot.frame(n+2) = updateRigidBody(R, p, robot.frame(n+2));

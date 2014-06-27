@@ -7,6 +7,12 @@
 
 clear all; close all;
 
+
+% Add path to drawing library if not already included
+if isempty(strfind(path, 'matlab-rigid-body-viz'))
+    addpath('../../matlab-rigid-body-viz/src');
+end
+
 x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
 
 %%%%%% Define Robot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

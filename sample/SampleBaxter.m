@@ -6,6 +6,12 @@
 
 clear all; close all;
 
+
+% Add path to drawing library if not already included
+if isempty(strfind(path, 'matlab-rigid-body-viz'))
+    addpath('../../matlab-rigid-body-viz/src');
+end
+
 figure(1);
 baxter = createBaxter('CreateFrames','off');
 axis equal;
@@ -18,7 +24,6 @@ t = 0:0.033:2;
 ql = zeros(7,1); % left arm joint angles
 qr = zeros(7,1); % right arm joint angles
 qh = 0; % head pan angle
-
 
 for k=1:length(t);    
     ql(2) = pi/4*sin(2*pi*t(k)); % s1 in left arm

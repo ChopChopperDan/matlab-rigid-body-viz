@@ -24,6 +24,7 @@ R0 = rot([0;1;0],pi/2);
 p0 = [0;0.3;0.1];
 
 figure(1);
+opengl('software');
 cyl = createCylinder(R0,p0,cyl_param,cyl_props{:});
 % Attach 3D Frame to cylinder
 frame = create3DFrame(R0,p0,frame_param);
@@ -40,6 +41,8 @@ t = 0:dt:2;
 % angular velocity of cylinder
 w = 2*pi;
 
+vidObj = VideoWriter('BodyAnimation.mp4','MPEG-4');
+open(vidObj);
 
 for k=1:length(t)
     % Calculate new rotation and position at time t(k)
@@ -48,4 +51,8 @@ for k=1:length(t)
     figure(1);
     cyl = updateRigidBody(R,p,cyl);
     drawnow;
+    currFrame = getframe;
+    writeVideo(vidObj,currFrame);
 end
+
+close(vidObj);
