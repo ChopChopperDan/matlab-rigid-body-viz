@@ -1,7 +1,9 @@
 function baxter_const = defineBaxter(origin)
     %
     % baxter_const = defineBaxter()
-    % baxter_const = defineBaxter(origin) - can define
+    % baxter_const = defineBaxter(origin) - origin is [4 x 4] matrix
+    % denoting orientation and translation of Baxter with respect to the
+    % world frame
     %
     % define-file for the Rethink Robotics Baxter.  Returns struct with the
     % following form:

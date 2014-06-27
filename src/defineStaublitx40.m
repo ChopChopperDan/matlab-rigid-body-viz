@@ -1,6 +1,9 @@
 function tx40_const = defineStaublitx40(origin)
     %
-    % tx40_const = defineStaublitx40(origin)
+    % tx40_const = defineStaublitx40()
+    % tx40_const = defineStaublitx40(origin) - origin is [4 x 4] matrix
+    % denoting orientation and translation of Staubli tx40 with respect 
+    % to the world frame
     %
     % define-file for the Staubli tx40 Robot.  Returns struct with the
     % following form:
@@ -21,8 +24,9 @@ function tx40_const = defineStaublitx40(origin)
     
     % Kinematic constants
     tx40_const.H = origin(1:3,1:3)*[z0 x0 x0 z0 x0 z0];
-    tx40_const.P = origin(1:3,4) + origin(1:3,1:3)*[.32*z0 zed ...
+    tx40_const.P = origin(1:3,1:3)*[.32*z0 zed ...
                                 [.035;0;.225] zed .225*z0 .065*z0 zed];
+    tx40_const.P(:,1) = origin(1:3,4) + tx40_const.P(:,1);
     tx40_const.type = zeros(1,6);
     tx40_const.n = 6;
     tx40_const.origin = [eye(3) zed; zed' 1];
