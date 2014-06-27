@@ -1,6 +1,6 @@
-function h_staubli = createStaublitx40(varargin)
+function handle = createStaublitx40(varargin)
     %
-    % h_staubli = createStaublitx40(...)
+    % handle = createStaublitx40(...)
     %
     % File to create a Staubli tx40 drawing object.
     %
@@ -16,6 +16,8 @@ function h_staubli = createStaublitx40(varargin)
     %       attachObjectToRobot.m
     %
     % returns handle to the staubli tx40 robot structure
+    %
+    % see also DEFINESTAUBLITX40
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
     
@@ -33,12 +35,7 @@ function h_staubli = createStaublitx40(varargin)
     if ~exist('cf','var'); cf = 'off'; end
     if ~exist('origin','var'); origin = [eye(3) zed; zed' 1]; end
     
-    %%%%%% Define Kinematics for arm %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    staubli.H = [z0 x0 x0 z0 x0 z0];
-    staubli.P = [.32*z0 zed [.035;0;.225] zed .225*z0 .065*z0 zed];
-    staubli.type = zeros(1,6);
-    staubli.n = 6;
-    staubli.origin = origin;
+    staubli = defineStaublitx40(origin);
     
     %%%%%% Define visual properties for robot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     link_props = {'FaceColor', [.9;0.9;0.9], ...
@@ -47,24 +44,11 @@ function h_staubli = createStaublitx40(varargin)
     
     %%%%%% Joint Definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    staubli.joint(1).radius = 0.084;
-    staubli.joint(1).height = 0.165;
-    staubli.joint(1).props = joint_props;
-    staubli.joint(2).radius = 0.082;
-    staubli.joint(2).height = 0.1855;
-    staubli.joint(2).props = joint_props;
-    staubli.joint(3).radius = 0.061;
-    staubli.joint(3).height = 0.117;
-    staubli.joint(3).props = joint_props;
-    staubli.joint(4).radius = 0.0585;
-    staubli.joint(4).height = 0.124;
-    staubli.joint(4).props = joint_props;
-    staubli.joint(5).radius = 0.04;
-    staubli.joint(5).height = 0.093;
-    staubli.joint(5).props = joint_props;
-    staubli.joint(6).radius = 0.02;
-    staubli.joint(6).height = 0.005;
-    staubli.joint(6).props = joint_props;
+    for i=1:staubli.n
+        staubli.joint(i).radius = staubli.joint_radius(i);
+        staubli.joint(i).height = staubli.joint_height(i);
+        staubli.joint(i).props = joint_props;
+    end
     
     %%%%%% Link Defintions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     staubli.link_type = [1 0 1 0 1 1 0];
@@ -95,13 +79,7 @@ function h_staubli = createStaublitx40(varargin)
     
     staubli.frame.scale = 0.1;
     staubli.frame.width = 0.01;
-    
-    % Guess
-    staubli.gripper.width = .1;
-    staubli.gripper.height = .1;
-    staubli.gripper.R0 = eye(3);
-        
-    h_staubli = createRobot(staubli,'CreateFrames',cf, ...
-                                        'CreateGripper','on');
-    axis equal;
+            
+    handle = createRobot(staubli,'CreateFrames',cf, ...
+                                        'CreateGripper','off');
 end

@@ -1,4 +1,51 @@
 function baxter_const = defineBaxter(origin)
+    %
+    % baxter_const = defineBaxter()
+    % baxter_const = defineBaxter(origin) - can define
+    %
+    % define-file for the Rethink Robotics Baxter.  Returns struct with the
+    % following form:
+    %
+    % root
+    %   -> left_arm
+    %       -> H        : [3 x 7] joint axes
+    %       -> P        : [3 x 8] rigid translation between each joint
+    %       -> type     : [1 x 7] joint types
+    %       -> n        : scalar number of joints
+    %       -> origin   : [4 x 4] transformation matrix to origin
+    %
+    %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
+    %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
+    %       -> velocity_limit    :  [7 x 1] velocity limits    [rad/s]
+    %       -> effort_limit      :  [7 x 1] effort limits      [Nm/s]
+    %
+    %       -> joint_radius      :  [7 x 1] radii of each joint [m]
+    %       -> joint_height      :  [7 x 1] height of each joint [m]
+    %   -> right_arm
+    %       -> H        : [3 x 7] joint axes
+    %       -> P        : [3 x 8] rigid translation between each joint
+    %       -> type     : [1 x 7] joint types
+    %       -> n        : scalar number of joints
+    %       -> origin   : [4 x 4] transformation matrix to origin
+    %
+    %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
+    %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
+    %       -> velocity_limit    :  [7 x 1] velocity limits    [rad/s]
+    %       -> effort_limit      :  [7 x 1] effort limits      [Nm/s]
+    %
+    %       -> joint_radius      :  [7 x 1] radii of each joint [m]
+    %       -> joint_height      :  [7 x 1] height of each joint [m]
+    %   -> head
+    %       -> H        : [3 x 1] joint axes
+    %       -> P        : [3 x 2] rigid translation between each joint
+    %       -> type     : [1 x 1] joint types
+    %       -> n        : scalar number of joints
+    %       -> origin   : [4 x 4] transformation matrix to origin
+    %
+    %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
+    %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
+    %
+    %   see also CREATEBAXTER 
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
     if ~exist('origin','var'); origin = [eye(3) zed; zed' 1]; end

@@ -27,6 +27,8 @@
     %       left_arm
     %       right_arm
     %       head
+    %
+    % see also DEFINEBAXTER
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
     
