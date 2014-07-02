@@ -1,12 +1,13 @@
 function robot = graspLoad(object, robot)
     %
-    % robot = attachObjectToRobot(object, frame, robot)
+    % robot = graspLoad(object, robot)
     %
     % object is a handle to a drawing structure for grasp.  If load already
     %   exists, will not attempt grasp
     % robot is a handle to the robot structure
     %
-    % returns handle to updated robot structure
+    % returns handle to updated robot structure with object and local
+    %       transformation added to the robot.load field
     
     if ~isempty(robot.load)
         return;
