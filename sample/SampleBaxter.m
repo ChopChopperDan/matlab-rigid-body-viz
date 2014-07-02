@@ -19,7 +19,7 @@ axis([-2 2 -2 2 -.85 1]);
 
 %% Simple Animation
 
-t = 0:0.033:2;
+t = 0:0.02:2;
 
 ql = zeros(7,1); % left arm joint angles
 qr = zeros(7,1); % right arm joint angles

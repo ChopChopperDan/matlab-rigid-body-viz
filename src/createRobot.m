@@ -28,6 +28,7 @@ function handle = createRobot(robot,varargin)
     %               describing each link
     %       [opt] frame: parameters describing coordinate frames, if drawn
     %       [opt] gripper: parameters describing the gripper, if drawn
+    %               *based on ParallelJawGripper parameterization
     %
     % Optional Additional Properties:
     %       'CreateFrames'          default: 'off'
@@ -42,7 +43,7 @@ function handle = createRobot(robot,varargin)
     %
     % returns handle to robot drawing object
     %
-    % see also UPDATEROBOT
+    % see also UPDATEROBOT CREATEPARALLELJAWGRIPPER CREATE3DFRAME
 
     % Walk through varargin
     for i=1:2:(nargin-1)

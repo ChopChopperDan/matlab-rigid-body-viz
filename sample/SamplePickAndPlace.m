@@ -51,7 +51,8 @@ simple_robot.joint(2).props = {};
 simple_robot.frame.scale = 0.4;
 simple_robot.frame.width = 0.05;
 
-simple_robot.gripper.width = 0.4;
+simple_robot.gripper.aperture = 0.4;
+simple_robot.gripper.stroke = 0.4;
 simple_robot.gripper.height = 0.25;
 simple_robot.gripper.R0 = rot(y0,pi/2)*rot(z0,pi/2);
 
@@ -72,7 +73,7 @@ load.labels = attachPrefix('load_', load.labels);
 %% Animate robot with joint displacements
 
 % timestepping
-t = 0:0.033:1;
+t = 0:0.02:1;
 
 % pre-defined robot motion
 q1 = pi/2*t;

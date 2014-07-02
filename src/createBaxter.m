@@ -152,7 +152,8 @@
     head.frame = right_arm.frame;
     
     %%%%%% Define gripper dimensions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    left_arm.gripper.width = 0.06;
+    left_arm.gripper.aperture = 0.06;
+    left_arm.gripper.stroke = 0.06;
     left_arm.gripper.height = 0.08;
     left_arm.gripper.fingerwidth = 0.01;
     left_arm.gripper.R0 = rot(z0,-pi/4)*rot(x0,-pi/2);
