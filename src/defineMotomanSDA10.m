@@ -65,8 +65,8 @@ function sda10_const = defineMotomanSDA10(origin)
     right_arm.lower_joint_limit = [-170; -90; -110; -170; -225; ...
                                         -180; -110; -180]*pi/180;
     
-    left_arm.joint_radius = [0.1;0.05;0.05;0.05;0.05;0.05;0.05;0.05];
-    left_arm.joint_height = [0.1;0.1;0.1;0.1;0.1;0.1;0.1;0.02];
+    left_arm.joint_radius = [0.12;0.08;0.08;0.08;0.06;0.05;0.05;0.045];
+    left_arm.joint_height = [0.1;0.1;0.16;0.16;0.12;0.1;0.1;0.02];
     right_arm.joint_radius = left_arm.joint_radius;
     right_arm.joint_height = left_arm.joint_height;
     
