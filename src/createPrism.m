@@ -1,6 +1,6 @@
 function handle = createPrism(R0, t0, param, varargin)
     %
-    % h_p = createPrism(R0, t0, param,...)
+    % handle = createPrism(R0, t0, param,...)
     %
     % R0 is orientation of the prism relative to body frame
     % t0 is center of the prism relative to body frame

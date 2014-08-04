@@ -1,6 +1,6 @@
 function handle = createPrismaticJoint(R0, t0, param, varargin)
     % 
-    % handle = createGenericGripper(R0, t0, param, ...)
+    % handle = createPrismaticJoint(R0, t0, param, ...)
     %
     % R0 is orientation of the gripper relative to body frame
     % t0 is base of the gripper relative to body frame

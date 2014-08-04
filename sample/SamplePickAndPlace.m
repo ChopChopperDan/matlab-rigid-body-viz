@@ -10,7 +10,9 @@ clear all; close all;
 
 % Add path to drawing library if not already included
 if isempty(strfind(path, 'matlab-rigid-body-viz'))
-    addpath('../../matlab-rigid-body-viz/src');
+    addpath('./..');
+    rigidbodyviz_setup();
+    rmpath('./..');
 end
 
 x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
@@ -73,7 +75,7 @@ load.labels = attachPrefix('load_', load.labels);
 %% Animate robot with joint displacements
 
 % timestepping
-t = 0:0.02:1;
+t = 0:0.01:1;
 
 % pre-defined robot motion
 q1 = pi/2*t;

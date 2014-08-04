@@ -8,7 +8,9 @@ clear all; close all;
 
 % Add path to drawing library if not already included
 if isempty(strfind(path, 'matlab-rigid-body-viz'))
-    addpath('../../matlab-rigid-body-viz/src');
+    addpath('./..');
+    rigidbodyviz_setup();
+    rmpath('./..');
 end
 
 % Define body

@@ -15,7 +15,6 @@ function handle = updateRigidBody(R, t, handle)
     R12 = R*handle.R';
     t12 = t - R12*handle.t;
     
-    
     for i=1:length(handle.bodies)
         V = get(handle.bodies(i),'Vertices');
         dim = size(V);

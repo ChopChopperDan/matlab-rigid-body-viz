@@ -1,6 +1,6 @@
-function h_create = createiRobotCreate(varargin)
+function handle = createiRobotCreate(varargin)
     %
-    % h_create = createiRobotCreate(...)
+    % handle = createiRobotCreate(...)
     %
     % File to create an iRobot Create drawing object
     %
@@ -66,7 +66,7 @@ function h_create = createiRobotCreate(varargin)
     
     %%%%%% Create robot objects %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    h_create = createRobot(create, 'CreateFrames', cf, ...
+    handle = createRobot(create, 'CreateFrames', cf, ...
                                     'CreateGripper', 'off');
                                 
     %%%%%% Attach extra body parts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,7 +84,7 @@ function h_create = createiRobotCreate(varargin)
                                 inner_R*sin(inner_theta)];
     bumper_param.height = .065;
     bumper_props = {'FaceColor', [0.6;0.6;0.6], 'EdgeAlpha', 0};
-    bumper_t0 = h_create.frame(end).t + origin(1:3,1:3)*0.0425*z0;
+    bumper_t0 = handle.frame(end).t + origin(1:3,1:3)*0.0425*z0;
     
     bumper = createPrism(origin(1:3,1:3), bumper_t0, ...
                     bumper_param, bumper_props{:});
@@ -98,8 +98,8 @@ function h_create = createiRobotCreate(varargin)
     
     leftwheel_R0 = origin(1:3,1:3)*rot(x0,pi/2);
     rightwheel_R0 = origin(1:3,1:3)*rot(x0,pi/2);
-    leftwheel_t0 = h_create.frame(end).t + origin(1:3,1:3)*[0;.13;.02];
-    rightwheel_t0 = h_create.frame(end).t + origin(1:3,1:3)*[0;-.13;.02];
+    leftwheel_t0 = handle.frame(end).t + origin(1:3,1:3)*[0;.13;.02];
+    rightwheel_t0 = handle.frame(end).t + origin(1:3,1:3)*[0;-.13;.02];
     
     leftwheel = createCylinder(leftwheel_R0, leftwheel_t0, ...
                                     wheel_param, wheel_props{:});
@@ -113,16 +113,16 @@ function h_create = createiRobotCreate(varargin)
     caster_props = {'FaceColor',[0;0;0]};
     
     caster_R0 = origin(1:3,1:3)*rot(x0,pi/2);
-    caster_t0 = h_create.frame(end).t + origin(1:3,1:3)*[.15;0;-.005];
+    caster_t0 = handle.frame(end).t + origin(1:3,1:3)*[.15;0;-.005];
     caster = createCylinder(caster_R0, caster_t0, ...
                                     caster_param, caster_props{:});
     caster.labels = attachPrefix('caster_',caster.labels);
     
     
-    h_create = attachObjectToRobot(bumper,3, h_create);
-    h_create = attachObjectToRobot(leftwheel,3, h_create);
-    h_create = attachObjectToRobot(rightwheel,3, h_create);
-    h_create = attachObjectToRobot(caster,3, h_create);
+    handle = attachObjectToRobot(bumper,3, handle);
+    handle = attachObjectToRobot(leftwheel,3, handle);
+    handle = attachObjectToRobot(rightwheel,3, handle);
+    handle = attachObjectToRobot(caster,3, handle);
 end
     
     

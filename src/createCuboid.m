@@ -1,6 +1,6 @@
 function handle = createCuboid(R0, t0, param, varargin)
     %
-    % h_p = drawCuboidPatch(R, t, param,...)
+    % handle = createCuboid(R0, t0, param,...)
     %
     % R0 is 3 x 3 matrix for orientation of the cuboid
     % t0 is 3 x 1 vector for center of the cuboid

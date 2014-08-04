@@ -1,4 +1,4 @@
-    function h_baxter = createBaxter(varargin)
+    function handle = createBaxter(varargin)
     % 
     % h_baxter = createBaxter(...)
     %
@@ -161,11 +161,11 @@
     right_arm.gripper.R0 = rot(z0,pi/4)*rot(x0,pi/2);
     
     %%%%%% Create robot objects %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    h_baxter.left_arm = createRobot(left_arm,'CreateFrames',cf, ...
+    handle.left_arm = createRobot(left_arm,'CreateFrames',cf, ...
                                             'CreateGripper','on');
-    h_baxter.right_arm = createRobot(right_arm,'CreateFrames',cf, ...
+    handle.right_arm = createRobot(right_arm,'CreateFrames',cf, ...
                                             'CreateGripper','on');
-    h_baxter.head = createRobot(head,'CreateFrames',cf, ...
+    handle.head = createRobot(head,'CreateFrames',cf, ...
                                             'CreateGripper','off');
     
     %%%%%% Attach extra body parts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,7 +174,7 @@
     neck_props = {'FaceColor',[0.9;0;0],'EdgeAlpha',0};
     neck_params.radius = 0.04;
     neck_params.height = 0.28;
-    t_neck = h_baxter.head.frame(2).t - origin(1:3,1:3)*[.1395;0;0.06];
+    t_neck = handle.head.frame(2).t - origin(1:3,1:3)*[.1395;0;0.06];
     h_neck = createCylinder(origin(1:3,1:3)*rot(y0,pi/8), ...
                         t_neck, neck_params, neck_props{:});
     h_neck.labels = attachPrefix('neck_',h_neck.labels);
@@ -184,7 +184,7 @@
     sonar_head_params.radius = 0.075;
     sonar_head_params.radius2 = 0.06;
     sonar_head_params.height = 0.16;
-    t_sonar_head = h_baxter.head.frame(2).t + origin(1:3,1:3)*0.08*z0;
+    t_sonar_head = handle.head.frame(2).t + origin(1:3,1:3)*0.08*z0;
     h_sonar_head = createCylinder(origin(1:3,1:3), ...
                     t_sonar_head, sonar_head_params,sonar_head_props{:});
     h_sonar_head.labels = attachPrefix('sonar_head_',h_sonar_head.labels);
@@ -194,14 +194,14 @@
     arm_mount_param.width = 0.2;
     arm_mount_param.length = 0.15;
     arm_mount_param.height = 0.05;
-    t_larm_mount = h_baxter.left_arm.frame(2).t + ...
+    t_larm_mount = handle.left_arm.frame(2).t + ...
             origin(1:3,1:3)*rot(z0,75*pi/180)*[-.025;0;-0.075];
     h_left_arm_mount = createCuboid(origin(1:3,1:3)*rot(z0,75*pi/180), ...
                 t_larm_mount, arm_mount_param, arm_mount_props{:});
     h_left_arm_mount.labels = attachPrefix('arm_mount_', ...
                                         h_left_arm_mount.labels);
     
-    t_rarm_mount = h_baxter.right_arm.frame(2).t + ...
+    t_rarm_mount = handle.right_arm.frame(2).t + ...
             origin(1:3,1:3)*rot(z0,-75*pi/180)*[-.025;0;-0.075];
     h_right_arm_mount = createCuboid(origin(1:3,1:3)*rot(z0,-75*pi/180), ...
                 t_rarm_mount, arm_mount_param,arm_mount_props{:});
@@ -209,12 +209,12 @@
                                         h_right_arm_mount.labels);
                                     
     % Attach parts to robot
-    h_baxter.head = attachObjectToRobot(h_neck,0,h_baxter.head);
-    h_baxter.head = attachObjectToRobot(h_sonar_head,0,h_baxter.head);
-    h_baxter.left_arm = attachObjectToRobot(h_left_arm_mount,0, ...
-                                    h_baxter.left_arm);
-    h_baxter.right_arm = attachObjectToRobot(h_right_arm_mount,0, ...
-                                    h_baxter.right_arm);
+    handle.head = attachObjectToRobot(h_neck,0,handle.head);
+    handle.head = attachObjectToRobot(h_sonar_head,0,handle.head);
+    handle.left_arm = attachObjectToRobot(h_left_arm_mount,0, ...
+                                    handle.left_arm);
+    handle.right_arm = attachObjectToRobot(h_right_arm_mount,0, ...
+                                    handle.right_arm);
     
     % Create optional pedestal
     if strcmp(cp,'on')
@@ -222,16 +222,16 @@
         pedestal_top_props = {'FaceColor', [0.4;0.4;0.4], 'EdgeAlpha', 0};
         pedestal_top_param.radius = .18;
         pedestal_top_param.height = .12;
-        t_pedestal_top = h_baxter.head.frame(1).t - ...
-                            h_baxter.head.frame(1).R*.06*z0;
-        h_pedestal_top = createCylinder(h_baxter.head.frame(1).R, ...
+        t_pedestal_top = handle.head.frame(1).t - ...
+                            handle.head.frame(1).R*.06*z0;
+        h_pedestal_top = createCylinder(handle.head.frame(1).R, ...
                 t_pedestal_top, pedestal_top_param,pedestal_top_props{:});
 
         % Pedestal body
         pedestal_body_props = {'FaceColor', [.2;.2;.2], 'EdgeAlpha', 0};
         pedestal_body_param.radius = .1;
         pedestal_body_param.height = .5;
-        t_pedestal_body = h_baxter.head.frame(1).t - origin(1:3,1:3)*.37*z0;
+        t_pedestal_body = handle.head.frame(1).t - origin(1:3,1:3)*.37*z0;
         h_pedestal_body = createCylinder(origin(1:3,1:3), ...
                 t_pedestal_body, pedestal_body_param,pedestal_body_props{:});
 
@@ -241,13 +241,13 @@
         pedestal_base_param.polygon = ...
                     [-.1 .4 .4 .15 .15 .4 .4 -.1 -.5 -.5 -.3 -.3 -.5 -.5; ...
                     .2 .4 .33 .1 -.1 -.33 -.4 -.2 -.4 -.27 -.1 .1 .27 .4];
-        t_pedestal_base = h_baxter.head.frame(1).t - origin(1:3,1:3)*.65*z0;
+        t_pedestal_base = handle.head.frame(1).t - origin(1:3,1:3)*.65*z0;
         h_pedestal_base = createPrism(origin(1:3,1:3), ...
                 t_pedestal_base, pedestal_base_param, pedestal_base_props{:});
             
-        h_baxter.head = attachObjectToRobot(h_pedestal_top,0,h_baxter.head);
-        h_baxter.head = attachObjectToRobot(h_pedestal_body,0,h_baxter.head);
-        h_baxter.head = attachObjectToRobot(h_pedestal_base,0,h_baxter.head);
+        handle.head = attachObjectToRobot(h_pedestal_top,0,handle.head);
+        handle.head = attachObjectToRobot(h_pedestal_body,0,handle.head);
+        handle.head = attachObjectToRobot(h_pedestal_base,0,handle.head);
     end
     
 end
