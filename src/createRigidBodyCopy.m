@@ -20,7 +20,7 @@ function dst_handle = createRigidBodyCopy(src_handle)
     
     for i=1:nb
         XYZ = get(src_handle.bodies(i),data);
-        src_props = get(src_handle.bodies(1),props);
+        src_props = get(src_handle.bodies(i),props);
         dst_props = reshape([props;src_props],[1 10]);
         dst_handle.bodies(i) = patch(XYZ{1},XYZ{2},XYZ{3},1);
         set(dst_handle.bodies(i),dst_props{:});

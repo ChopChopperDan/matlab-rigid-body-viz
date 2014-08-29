@@ -1,6 +1,10 @@
 function new_labels = attachPrefix(prefix, labels)
-    % Assuming a cell array of strings, labels, we attach the string,
-    % prefix, to the beginning of each item.
+% ATTACHPREFIX
+%
+%   new_labels = attachPrefix(prefix, labels)
+%
+%   Assuming a cell array of strings, labels, we attach the string,
+%   prefix, to the beginning of each item.
     
     new_labels = cell(size(labels));
     
