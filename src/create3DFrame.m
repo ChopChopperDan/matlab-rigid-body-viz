@@ -2,8 +2,8 @@ function handle = create3DFrame(R0, t0, param, varargin)
     %
     % handle = create3DFrame(R0, t0, param, ...)
     %
-    % R0 is orientation of the cuboid relative to body frame
-    % t0 is center of the cuboid relative to body frame
+    % R0 is the 3x3 orientation matrix representation of the 3D frame
+    % t0 is the 3x1 center of the 3D frame in the world frame
     % param is struct containing fields
     %       scale (length of each axis)
     %       width (width of each cylinder)
@@ -55,11 +55,11 @@ function handle = create3DFrame(R0, t0, param, varargin)
                                 'FaceColor',[0;0;1], ...
                                 'FaceAlpha', fa, ...
                                 'EdgeAlpha', ea);
-
-    handle.bodies = [h_x.bodies h_y.bodies h_z.bodies];
-    handle.labels = [attachPrefix('X_',h_x.labels) ...
-                        attachPrefix('Y_',h_y.labels) ...
-                        attachPrefix('Z_',h_z.labels)];
+    
+    h_y.labels = attachPrefix('Y_',h_x.labels);
+    h_x.labels = attachPrefix('X_',h_x.labels);
+    h_z.labels = attachPrefix('Z_',h_x.labels);
+    handle = combineRigidBodies(h_x,h_y,h_z);
     handle.R = eye(3);
     handle.t = [0;0;0];
 end

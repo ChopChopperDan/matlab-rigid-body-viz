@@ -35,14 +35,14 @@ function handle = createCamera(R0, t0, param, varargin)
     t0_lens = t0 - 1/2*param.lens.height*R0*z0;
     t0_body = t0 - (param.lens.height + 1/2*param.body.height) * R0*z0;
     
-    cam_params = {'FaceColor', c, 'EdgeColor', [0.5;0.5;0.5]};
+    cam_props = {'FaceColor', c, 'EdgeColor', [0.5;0.5;0.5]};
     
-    body = createCuboid(R0, t0_body, param.body, cam_params{:});
-    lens = createCylinder(R0, t0_lens, param.lens, cam_params{:});
+    body = createCuboid(R0, t0_body, param.body, cam_props{:});
+    lens = createCylinder(R0, t0_lens, param.lens, cam_props{:});
     
-    handle.bodies = [body.bodies lens.bodies];
-    handle.labels = [attachPrefix('camera_body_', body.labels) ...
-                        attachPrefix('camera_lens_', lens.labels)];
+    body.labels = attachPrefix('camera_body_', body.labels);
+    lens.labels = attachPrefix('camera_lens_', lens.labels);
+    handle = combineRigidBodies(body, lens);
     handle.R = eye(3);
     handle.t = t0;
 end
