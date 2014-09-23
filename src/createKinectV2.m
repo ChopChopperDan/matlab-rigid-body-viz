@@ -47,8 +47,8 @@ function handle = createKinectV2(R0, t0, param, varargin)
     lens_param.radius = .015;
     lens_param.height = .002;
     
-    R_base = R0*rot([1;0;0],pi/2);
     % These values were determined from a calibration process
+    R_base = R0*rot([1;0;0],pi/2);
     t_base = t0 + R_base*[0.0444;-0.0218;-0.0014];
     t_lens = t0 + R0*[-.0475;-0.0015;0.01];
     
