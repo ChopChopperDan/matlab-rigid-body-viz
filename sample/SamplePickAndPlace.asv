@@ -61,15 +61,17 @@ axis([-3.5 3.5 -3.5 3.5 -1 1]);
 view([0 90])
 
 % place object in world
-load_param.radius = 0.2;
+load_param.radius = 0.19;
 load = createEllipsoid(eye(3),[0;3.25;0],load_param,'FaceColor',[0;1;1]);
 load.labels = attachPrefix('load_', load.labels);
 
 
 %% Animate robot with joint displacements
 
-% pre-defined robot motion
+% timestepping
 t = 0:0.01:1;
+
+% pre-defined robot motion
 q1 = pi/2*t;
 q2 = 0*t;
 
@@ -79,27 +81,19 @@ for k=1:length(t)
     drawnow;
 end
 
-pause(0.01);
-
 % grab object
 if norm(h_robot.frame(end).t - load.t) <= 0.5
     % Animate gripper closing
-    t = 0:0.01:0.5;
-    w = h_robot.end_effector.gripper_info.aperture - 0.1*t;
     for k=1:length(t)
-        h_robot.end_effector = updateParallelJawGripper(w(k), ...
-                                h_robot.end_effector);
+        h_robot = updateRobot([q1(k);q2(k)],h_robot);
         drawnow;
     end
     h_robot = graspLoad(load,h_robot);
 end
 
-pause(0.01);
-
 % pre-defined robot motion
-t = 0:0.01:2;
-q1 = q1(end)-pi/2*t;
-q2 = q2(end)-3*pi/8*t;
+q1 = q1(end)-pi*t;
+q2 = q2(end)-3*pi/4*t;
 
 % move robot to desired new location
 for k=1:length(t)
@@ -107,23 +101,10 @@ for k=1:length(t)
     drawnow;
 end
 
-pause(0.01);
-
 % release object
-% Animate gripper opening
-t = 0:0.01:0.5;
-w = h_robot.end_effector.gripper_info.aperture + 0.1*t;
-for k=1:length(t)
-    h_robot.end_effector = updateParallelJawGripper(w(k), ...
-                            h_robot.end_effector);
-    drawnow;
-end
 [h_robot, load] = releaseLoad(h_robot);
 
-pause(0.01);
-
 % return robot to zero position
-t = 0:0.01:1;
 q1 = q1(end) - q1(end)*t;
 q2 = q2(end) - q2(end)*t;
 

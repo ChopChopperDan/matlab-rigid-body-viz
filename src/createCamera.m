@@ -4,7 +4,7 @@ function handle = createCamera(R0, t0, param, varargin)
     %
     % R0 is the 3x3 orientation matrix of the camera
     % t0 is the 3x1 position of the lens of the camera
-    % param is a struct containing the fields
+    % param is struct containing fields
     %       body (cuboid parameterization)
     %       lens (cylinder parameterization)
     %

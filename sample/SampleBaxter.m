@@ -3,16 +3,10 @@
 % pre-defined robots within the library.  In this example, we take a
 % Rethink Robotics 'Baxter' robot and animate it following a prescribed
 % path
+%
+% Be sure to use rigidbodyviz_setup() before running
 
 clear all; close all;
-
-
-% Add path to drawing library if not already included
-if isempty(strfind(path, 'matlab-rigid-body-viz'))
-    addpath('./..');
-    rigidbodyviz_setup();
-    rmpath('./..');
-end
 
 figure(1);
 baxter = createBaxter('CreateFrames','off');

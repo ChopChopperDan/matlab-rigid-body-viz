@@ -3,15 +3,10 @@
 % laying on its side, and then rolling along a surface with a constant
 % angular velocity.  It is intended to demonstrate a simple creation of a
 % body and how to update the body to desired poses.
+%
+% Be sure to use rigidbodyviz_setup() before running
 
 clear all; close all;
-
-% Add path to drawing library if not already included
-if isempty(strfind(path, 'matlab-rigid-body-viz'))
-    addpath('./..');
-    rigidbodyviz_setup();
-    rmpath('./..');
-end
 
 % Define body
 cyl_param.radius = 0.1;

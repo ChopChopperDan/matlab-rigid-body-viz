@@ -20,7 +20,7 @@ function handle = createParallelJawGripper(R0, t0, param, varargin)
     %
     % returns handle to drawing structure
     %
-    % see also ACTUATEPARALLELJAWGRIPPER
+    % see also UPDATEPARALLELJAWGRIPPER
     
     % Walk through varargin
     for i=1:2:(nargin-3)

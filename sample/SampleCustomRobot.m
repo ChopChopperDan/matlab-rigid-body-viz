@@ -3,15 +3,10 @@
 % 3D drawing package for robot visualization.  This script defines a RP 
 % (revolute-prismatic) planar robot, and has it follow a simple 
 % prescribed path.
+%
+% Be sure to use rigidbodyviz_setup() before running
 
 clear all; close all;
-
-% Add path to drawing library if not already included
-if isempty(strfind(path, 'matlab-rigid-body-viz'))
-    addpath('./..');
-    rigidbodyviz_setup();
-    rmpath('./..');
-end
 
 x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
 

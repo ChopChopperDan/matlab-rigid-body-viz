@@ -1,6 +1,6 @@
-function handle = actuateParallelJawGripper(aperture,handle)
+function handle = updateParallelJawGripper(aperture,handle)
     %
-    % handle = actuateParallelJawGripper(aperture, handle)
+    % handle = updateParallelJawGripper(aperture, handle)
     %
     % aperture is the desired opening between the two grippers 
     %   (0 is completely closed)
