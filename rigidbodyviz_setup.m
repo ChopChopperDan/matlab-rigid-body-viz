@@ -19,13 +19,25 @@ function root = rigidbodyviz_setup()
                 root_old = path_str(idx0+1:idx(1)-1);
             end
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz'))
-            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', 'src'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', 'sample'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', 'src'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                                'src', 'create'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                                'src', 'def'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                                'src', 'update'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                                'src', 'util'));
         end
     end
         
 
     addpath(root);
-    addpath(fullfile(root, 'src'));
     addpath(fullfile(root, 'sample'));
+    addpath(fullfile(root, 'src'));
+    addpath(fullfile(root, 'src', 'create'));
+    addpath(fullfile(root, 'src', 'def'));
+    addpath(fullfile(root, 'src', 'update'));
+    addpath(fullfile(root, 'src', 'util'));
 end
