@@ -107,8 +107,7 @@ function handle = createRobot(robot,varargin)
         if abs(z0'*h)==1
             Rj = eye(3);
         else
-            phi = asin(norm(hat(z0)*h));
-            if z0'*h < 0; phi = -phi; end
+            phi = acos(h(3));
             Rj = rot(hat(z0)*h,phi);
         end
         
@@ -195,7 +194,8 @@ function handle = createRobot(robot,varargin)
     % If drawing generic parallel jaw gripper, draw at O_T
     if strcmpi(cg,'on')
         RT = R*robot.gripper.R0;
-        handle.end_effector = createParallelJawGripper(RT,p,robot.gripper);
+        handle.end_effector = createParallelJawGripper(RT,[0;0;0],robot.gripper);
+        handle.end_effector = updateRigidBody(eye(3),p,handle.end_effector);
     else
         handle.end_effector = [];
     end

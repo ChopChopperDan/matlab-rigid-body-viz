@@ -59,7 +59,8 @@ function handle = createParallelJawGripper(R0, t0, param, varargin)
                         attachPrefix('rjaw_',right_jaw.labels) ...
                         attachPrefix('palm_', middle_bar.labels)];
     handle.R = eye(3);
-    handle.t = t0;
+    handle.t = [0;0;0];
+    handle.A = eye(3);
     handle.gripper_info.param = param;
     handle.gripper_info.RT = R0;
     handle.gripper_info.aperture = param.aperture;

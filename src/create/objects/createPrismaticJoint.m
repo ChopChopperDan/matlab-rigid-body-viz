@@ -79,7 +79,8 @@ function handle = createPrismaticJoint(R0, t0, param, varargin)
     handle.labels = [attachPrefix('body_',body.labels) ...
                         attachPrefix('slider_',slider.labels)];
     handle.R = eye(3);
-    handle.t = t0;
+    handle.t = [0;0;0];
+    handle.A = eye(3);
 end
     
     

@@ -68,13 +68,17 @@ axis([-3.5 3.5 -3.5 3.5 -1 1]);
 
 %% Animate robot with joint displacements
 
-t = 0:0.005:1;
+dt = 0.005;
+t = 0:dt:1;
 
 q1 = 2*pi*t;
 q2 = simple_robot.joint(2).height*(1 - cos(2*pi*t))/2;
 timestamps = zeros(1,length(t));
 
 for k=1:length(t)
+    tic;
     h_robot = updateRobot([q1(k);q2(k)],h_robot);
     drawnow;
+    t1 = toc;
+    pause(max(dt-t1,0));
 end

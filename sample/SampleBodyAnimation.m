@@ -17,15 +17,19 @@ cyl_props = {'FaceColor',[0;1;1],'FaceAlpha',0.5};
 frame_param.scale = 0.15;
 frame_param.width = 0.02;
 
+% Cylinder is defined with its long axis along z.  This rotation will place
+% that axis along the x axis
 R0 = rot([0;1;0],pi/2);
+% Desired initial position for the center of the cylinder
 p0 = [0;0.3;0.1];
 
 figure(1);
-cyl = createCylinder(R0,p0,cyl_param,cyl_props{:});
+cyl = createCylinder(R0,[0;0;0],cyl_param,cyl_props{:});
 % Attach 3D Frame to cylinder
-frame = create3DFrame(R0,p0,frame_param);
-cyl.bodies = [cyl.bodies frame.bodies];
-cyl.labels = [cyl.labels frame.labels];
+frame = create3DFrame(R0,[0;0;0],frame_param);
+cyl = combineRigidBodies(cyl, frame);
+% Place in initial position
+cyl = updateRigidBody(eye(3),p0,cyl);
 axis equal; axis([-1 1 -1 1 0 1]); grid on;
 
 %% Animate rolling across floor
@@ -39,9 +43,12 @@ w = 2*pi;
 
 for k=1:length(t)
     % Calculate new rotation and position at time t(k)
+    tic;
     R = rot([1;0;0],w*t(k));
     p = cyl.t + hat([w;0;0])*[0;0;0.1]*dt;
     figure(1);
     cyl = updateRigidBody(R,p,cyl);
     drawnow;
+    t1 = toc;
+    pause(max(dt - t1,0));
 end

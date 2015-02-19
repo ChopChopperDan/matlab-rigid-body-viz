@@ -62,5 +62,6 @@ function handle = create3DFrame(R0, t0, param, varargin)
     handle = combineRigidBodies(h_x,h_y,h_z);
     handle.R = eye(3);
     handle.t = [0;0;0];
+    handle.A = eye(3);
 end
     

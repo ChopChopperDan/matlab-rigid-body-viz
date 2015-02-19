@@ -81,6 +81,7 @@ function handle = createPrism(R0, t0, param, varargin)
                                         'EdgeColor',ec, ...
                                         'EdgeAlpha',ea);
     handle.R = eye(3);
-    handle.t = t0;
+    handle.t = [0;0;0];
+    handle.A = eye(3);
     handle.labels = {'sides','polygons'};
 end

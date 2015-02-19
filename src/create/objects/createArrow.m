@@ -63,6 +63,7 @@ function handle = createArrow(R0, t0, param, varargin)
     
     handle.R = eye(3);
     handle.t = t0;
+    handle.A = eye(3);
 end
     
     

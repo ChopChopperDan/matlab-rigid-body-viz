@@ -70,6 +70,7 @@ function handle = createTable(R0, t0, param, varargin)
                         attachPrefix('leg3_', leg3.labels) ...
                         attachPrefix('leg4_', leg4.labels)];
     handle.R = eye(3);
-    handle.t = t0;
+    handle.t = [0;0;0];
+    handle.A = eye(3);
 end
     
