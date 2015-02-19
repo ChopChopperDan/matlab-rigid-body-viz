@@ -8,9 +8,8 @@ function handle = createCuboid(R0, t0, param, varargin)
     %       width [X axis]
     %       length [Y axis]
     %       height [Z axis]
-    %       [opt] width2
-    %       [opt] length2
-    %       [opt] height2
+    %       [opt] width2 [X axis on -Z face]
+    %       [opt] length2 [Y axis on -Z face]
     % possible additional properties are:
     %       'FaceColor'  default: [1;1;1]
     %       'FaceAlpha'  default: 1
@@ -19,6 +18,8 @@ function handle = createCuboid(R0, t0, param, varargin)
     %       'EdgeAlpha'  default: 1
     %
     % returns handle to drawing structure
+    %
+    % see also CREATECYLINDER CREATEELLIPSOID CREATEPRISM
     
     % Walk through varargin
     for i=1:2:(nargin-3)
@@ -45,64 +46,49 @@ function handle = createCuboid(R0, t0, param, varargin)
     
     % verify parameters are correct
     if isfield(param,'width') && ...
-            isfield(param,'length') && isfield(param,'height')
+            isfield(param,'length') && ...
+            isfield(param,'height')
         w = param.width; l = param.length; h = param.height;
-        if isfield(param,'width2') || isfield(param,'length2') ...
-                || isfield(param,'height2')
-            if isfield(param,'width2') && ~isfield(param,'length2') ...
-                    && ~isfield(param,'height2')
-                w2 = param.width2;
-                l2 = l;
-                h2 = h;
-            elseif ~isfield(param,'width2') && isfield(param,'length2') ...
-                    && ~isfield(param,'height2')
-                w2 = w;
-                l2 = param.length2;
-                h2 = h;
-            elseif ~isfield(param,'width2') && ~isfield(param,'length2') ...
-                    && isfield(param,'height2')
-                w2 = w;
-                l2 = l;
-                h2 = param.height2;
-            else
-                disp('Valid parameterizations are:');
-                disp('    width, length, height - for cuboid');
-                disp('    [optional parameters]:');
-                disp('    width2 OR length2 OR height2 for trapezoidal faces');
-                error('Invalid Parameterization for cuboid');
-            end
+        if isfield(param,'width2')
+            w2 = param.width2;
         else
             w2 = w;
+        end
+        if isfield(param,'length2')
+            l2 = param.length2;
+        else
             l2 = l;
-            h2 = h;
         end
     else
         disp('Valid parameterizations are:');
         disp('    width, length, height - for cuboid');
         disp('    [optional parameters]:');
-        disp('    width2 OR length2 OR height2 for trapezoidal faces');
+        disp('    width2, length2 for trapezoidal faces');
         error('Invalid Parameterization for cuboid');
     end
     
+    % Vertices
+    V = 0.5*[-w2, -l2, -h; ...
+              -w,  -l,  h; ...
+             -w2,  l2, -h; ...
+              -w,   l,  h; ...
+              w2, -l2, -h; ...
+               w,  -l,  h; ...
+              w2,  l2, -h; ...
+               w,   l,  h];
+    V = V*R0' + ones(length(V),1)*t0';
     
+    % Faces
+    F = [1 2 4 3; ... %-X
+         5 6 8 7; ... %+X
+         1 2 6 5; ... %-Y
+         3 4 8 7; ... %+Y
+         1 3 7 5; ... %-Z
+         2 4 8 6];    %+Z
     
-    right_face = 0.5*[w2 w w w2; -l l l2 -l2; h h -h -h];          % +X
-    left_face = 0.5*[-w2 -w -w -w2; -l l l2 -l2; h2 h2 -h2 -h2];   % -X
-    front_face = 0.5*[-w -w w w; l l2 l2 l; h2 -h2 -h h];          % +Y
-    back_face = 0.5*[-w2 -w2 w2 w2; -l -l2 -l2 -l; h2 -h2 -h h];   % -Y
-    top_face = 0.5*[-w -w2 w2 w; l -l -l l; h2 h2 h h];            % +Z
-    bottom_face = 0.5*[-w -w2 w2 w; l2 -l2 -l2 l2; -h2 -h2 -h -h]; % -Z
-
-    faces_rot = t0*ones(1,24) + ...
-        R0*[left_face right_face front_face back_face ...
-            top_face bottom_face];
-
-    faces_X = reshape(faces_rot(1,:),[4 6]);
-    faces_Y = reshape(faces_rot(2,:),[4 6]);
-    faces_Z = reshape(faces_rot(3,:),[4 6]);
-    
-    handle.bodies(1) = patch(faces_X,faces_Y,faces_Z,1, ...
-                                    'FaceColor',fc, ...
+    FV.Vertices = V;
+    FV.Faces = F;
+    handle.bodies(1) = patch(FV, 'FaceColor',fc, ...
                                     'FaceAlpha',fa, ...
                                     'LineWidth',lw, ...
                                     'EdgeColor',ec, ...

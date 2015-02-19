@@ -22,13 +22,19 @@ function root = rigidbodyviz_setup()
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', 'sample'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', 'src'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
-                                                'src', 'create'));
+                                        'src', 'create'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
-                                                'src', 'def'));
+                                        'src', 'create', 'objects'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
-                                                'src', 'update'));
+                                        'src', 'create', 'primitives'));
             rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
-                                                'src', 'util'));
+                                        'src', 'create', 'robots'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                        'src', 'robot definitions'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                        'src', 'update'));
+            rmpath(fullfile(root_old, 'matlab-rigid-body-viz', ...
+                                        'src', 'util'));
         end
     end
         
@@ -37,7 +43,10 @@ function root = rigidbodyviz_setup()
     addpath(fullfile(root, 'sample'));
     addpath(fullfile(root, 'src'));
     addpath(fullfile(root, 'src', 'create'));
-    addpath(fullfile(root, 'src', 'def'));
+    addpath(fullfile(root, 'src', 'create', 'objects'));
+    addpath(fullfile(root, 'src', 'create', 'primitives'));
+    addpath(fullfile(root, 'src', 'create', 'robots'));
+    addpath(fullfile(root, 'src', 'robot definitions'));
     addpath(fullfile(root, 'src', 'update'));
     addpath(fullfile(root, 'src', 'util'));
 end

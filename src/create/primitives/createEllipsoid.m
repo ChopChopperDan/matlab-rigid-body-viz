@@ -2,8 +2,8 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     %
     % handle = createEllipsoid(R0, t0, param,...)
     %
-    % R0 is orientation of the ellipsoid relative to body frame
-    % t0 is center of the ellipsoid relative to body frame
+    % R0 is 3 x 3 matrix for orientation of the ellipsoid
+    % t0 is 3 x 1 vector for center of the ellipsoid
     % param is struct containing fields
     %       radius (draws a sphere)
     %       [opt] radiusX
@@ -17,6 +17,8 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     %       'EdgeAlpha'  default: 1
     %
     % returns handle to ellipsoid drawing structure
+    %
+    % see also CREATECUBOID CREATECYLINDER CREATEPRISM
     
     % Walk through varargin
     for i=1:2:(nargin-3)
@@ -61,36 +63,30 @@ function handle = createEllipsoid(R0,t0,param,varargin)
         return;
     end
     
-    N = 5;
-    theta = 0:pi/N:2*pi;
-    phi = 0:pi/N:pi;
     
-    c_th = cos(theta);
-    s_th = sin(theta);
-    c_phi = cos(phi);
-    s_phi = sin(phi);
+    % Vectices
+    n = 12; % resolution of points for circle discretization
+    theta = 2*pi*(0:1/n:(n-1)/n);
+    phi = pi*(0:1/n:1);
     
-    x1 = rx*c_th(1:2*N);
-    x2 = rx*c_th(2:2*N+1);
-    y1 = ry*s_th(1:2*N);
-    y2 = ry*s_th(2:2*N+1);
+    X = rx*cos(theta)'*sin(phi);
+    Y = ry*sin(theta)'*sin(phi);
+    Z = rz*ones(n,1)*cos(phi);
+    V = [X(:) Y(:) Z(:)];
+    V = V*R0' + ones(length(V),1)*t0';
     
-    faces = zeros(3,8*N*N);
-    for i=1:N
-        z1 = rz*c_phi(i)*ones(1,2*N);
-        z2 = rz*c_phi(i+1)*ones(1,2*N);
-        faces(:,(i-1)*8*N+1:4:i*8*N) = [x1*s_phi(i);y1*s_phi(i);z1];
-        faces(:,(i-1)*8*N+2:4:i*8*N) = [x2*s_phi(i);y2*s_phi(i);z1];
-        faces(:,(i-1)*8*N+3:4:i*8*N) = [x2*s_phi(i+1);y2*s_phi(i+1);z2];
-        faces(:,(i-1)*8*N+4:4:i*8*N) = [x1*s_phi(i+1);y1*s_phi(i+1);z2];
+    % Faces
+    F = zeros(n*n, 4);
+    for i=1:n 
+        for j=1:n
+            F((i-1)*n+j,:) = [(i-1)*n+j, (i-1)*n+mod(j,n)+1 ...
+                              i*n+mod(j,n)+1, i*n+j];
+        end
     end
     
-    faces = t0*ones(1,8*N*N) + R0*faces;
-    faces_X = reshape(faces(1,:),[4 2*N*N]);
-    faces_Y = reshape(faces(2,:),[4 2*N*N]);
-    faces_Z = reshape(faces(3,:),[4 2*N*N]);
-    handle.bodies(1) = patch(faces_X,faces_Y,faces_Z,1, ...
-                                    'FaceColor',fc, ...
+    FV.Vertices = V;
+    FV.Faces = F;
+    handle.bodies(1) = patch(FV, 'FaceColor',fc, ...
                                     'FaceAlpha',fa, ...
                                     'LineWidth',lw, ...
                                     'EdgeColor',ec, ...
