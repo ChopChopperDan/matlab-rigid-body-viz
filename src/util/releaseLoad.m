@@ -1,25 +1,30 @@
-function [robot, object] = releaseLoad(robot)
+function [handle, object] = releaseLoad(handle, robot)
     %
-    % [robot, object] = releaseLoad(robot)
+    % [handle, object] = releaseLoad(handle)
+    % [robot, object, robot] = releaseLoad(handle, robot)
     %
-    % robot is a handle to the robot structure
-    %
-    % NOTE:  DOES NOT REMOVE BODY FROM ENVIRONMENT, SIMPLY REMOVES IT FROM
-    % BEING ATTACHED TO ROBOT'S END EFFECTOR FRAME
+    % handle contains full information for robot structure
+    % [opt] robot is nested robot handle that is carrying load
     %
     % returns:
-    %       handle to updated robot structure 
-    %       handle to removed object
+    %       1. handle to updated full robot structure 
+    %       2. handle to removed object
+    %       3. [opt] handle to update nested robot structure 
     
-    if isempty(robot.load)
-        object = [];
-        return;
-    end
+    if nargin == 1, robot = handle.robots(1); end
+    if isempty(robot.load),  object = [];   return;   end
     
-    object.bodies = robot.load.bodies;
-    object.labels = robot.load.labels;
-    object.R = robot.frame(end).R*robot.load.Rb;
-    object.t = robot.frame(end).t + robot.frame(end).R*robot.load.tb;
+    object.bodies = handle.bodies(robot.load.bodies);
+    object.labels = handle.labels(robot.load.bodies);
+    RT = robot.base.R*robot.frames(end).R;
+    tT = robot.base.t + robot.base.R*robot.frames(end).t;    
+    object.R = RT*robot.load.Rb;
+    object.t = tT + RT*robot.load.tb;
+    object.A = eye(3);
     robot.load = [];
     
+    if nargin == 1 && nargout == 2
+        handle.robots(1) = robot;
+    end
+
 end

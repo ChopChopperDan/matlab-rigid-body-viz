@@ -20,16 +20,17 @@ function tx40_const = defineStaublitx40(origin)
     %
     % see also CREATESTAUBLITX40
     
-    x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
+    x0 = [1;0;0]; z0 = [0;0;1]; zed = [0;0;0];
+    
+    if nargin == 0, origin = [eye(3) zed; zed' 1];  end
     
     % Kinematic constants
     tx40_const.H = origin(1:3,1:3)*[z0 x0 x0 z0 x0 z0];
     tx40_const.P = origin(1:3,1:3)*[.32*z0 zed ...
                                 [.035;0;.225] zed .225*z0 .065*z0 zed];
     tx40_const.P(:,1) = origin(1:3,4) + tx40_const.P(:,1);
-    tx40_const.type = zeros(1,6);
-    tx40_const.n = 6;
-    tx40_const.origin = [eye(3) zed; zed' 1];
+    tx40_const.joint_type = zeros(1,6);
+    tx40_const.name = 'tx40';
     
     % Visualization constants
     tx40_const.joint_radius = [0.084 0.082 0.061 0.0585 0.04 0.02];

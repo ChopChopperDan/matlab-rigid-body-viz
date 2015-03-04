@@ -10,6 +10,7 @@ function dst_handle = createRigidBodyCopy(src_handle)
     % these terms can be directly copied
     dst_handle.R = src_handle.R;
     dst_handle.t = src_handle.t;
+    dst_handle.A = src_handle.A;
     dst_handle.labels = src_handle.labels;
     
     nb = length(src_handle.bodies);

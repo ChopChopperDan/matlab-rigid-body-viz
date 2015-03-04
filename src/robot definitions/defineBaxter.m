@@ -10,11 +10,9 @@ function baxter_const = defineBaxter(origin)
     %
     % root
     %   -> left_arm
-    %       -> H        : [3 x 7] joint axes
-    %       -> P        : [3 x 8] rigid translation between each joint
-    %       -> type     : [1 x 7] joint types
-    %       -> n        : scalar number of joints
-    %       -> origin   : [4 x 4] transformation matrix to origin
+    %       -> H                : [3 x 7] joint axes
+    %       -> P                : [3 x 8] rigid translation between each joint
+    %       -> joint_type       : [1 x 7] joint types
     %
     %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
     %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
@@ -24,11 +22,9 @@ function baxter_const = defineBaxter(origin)
     %       -> joint_radius      :  [7 x 1] radii of each joint [m]
     %       -> joint_height      :  [7 x 1] height of each joint [m]
     %   -> right_arm
-    %       -> H        : [3 x 7] joint axes
-    %       -> P        : [3 x 8] rigid translation between each joint
-    %       -> type     : [1 x 7] joint types
-    %       -> n        : scalar number of joints
-    %       -> origin   : [4 x 4] transformation matrix to origin
+    %       -> H                : [3 x 7] joint axes
+    %       -> P                : [3 x 8] rigid translation between each joint
+    %       -> joint_type       : [1 x 7] joint types
     %
     %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
     %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
@@ -38,11 +34,9 @@ function baxter_const = defineBaxter(origin)
     %       -> joint_radius      :  [7 x 1] radii of each joint [m]
     %       -> joint_height      :  [7 x 1] height of each joint [m]
     %   -> head
-    %       -> H        : [3 x 1] joint axes
-    %       -> P        : [3 x 2] rigid translation between each joint
-    %       -> type     : [1 x 1] joint types
-    %       -> n        : scalar number of joints
-    %       -> origin   : [4 x 4] transformation matrix to origin
+    %       -> H                : [3 x 1] joint axes
+    %       -> P                : [3 x 2] rigid translation between each joint
+    %       -> joint_type       : [1 x 1] joint types
     %
     %       -> upper_joint_limit :  [7 x 1] upper joint limits [rad]
     %       -> lower_joint_limit :  [7 x 1] lower joint limits [rad]
@@ -59,9 +53,8 @@ function baxter_const = defineBaxter(origin)
                     zed, [0.36435;0;-0.069], ...
                     zed, [0.37429;0;-0.01], ...
                     zed, 0.229525*x0]];
-    left_arm.type = zeros(1,7);
-    left_arm.n = 7;
-    left_arm.origin = [eye(3) zed; zed' 1];
+    left_arm.joint_type = zeros(1,7);
+    left_arm.name = 'baxter_left_arm';
     
     right_arm.H = origin(1:3,1:3)*rot(z0,-pi/4)*[z0 y0 x0 y0 x0 y0 x0];
     right_arm.P = origin(1:3,1:3)*[origin(1:3,4)+[0.06375;-.25888;0.119217], ...
@@ -69,15 +62,13 @@ function baxter_const = defineBaxter(origin)
                     zed, [0.36435;0;-0.069], ...
                     zed, [0.37429;0;-0.01], ...
                     zed, 0.229525*x0]];
-    right_arm.type = zeros(1,7);
-    right_arm.n = 7;
-    right_arm.origin = [eye(3) zed; zed' 1];
+    right_arm.joint_type = zeros(1,7);
+    right_arm.name = 'baxter_right_arm';
     
     head.H = origin(1:3,1:3)*z0;
     head.P = origin(1:3,1:3)*[origin(1:3,4) + [.0599;0;.6955] zed];
-    head.type = 0;
-    head.n = 1;
-    head.origin = [eye(3) zed; zed' 1];
+    head.joint_type = 0;
+    head.name = 'baxter_head';
     
     % Dynamic Constants
     left_arm.upper_joint_limit = [97.5; 60; 175; 150; 175; 120; 175]*pi/180;

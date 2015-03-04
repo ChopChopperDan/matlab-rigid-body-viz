@@ -1,4 +1,4 @@
-% Create of a pre-defined robot
+% Creation of a pre-defined robot
 % This is a test script to demonstrate how to take advantage of the
 % pre-defined robots within the library.  In this example, we take a
 % Rethink Robotics 'Baxter' robot and animate it following a prescribed
@@ -9,9 +9,10 @@
 clear all; close all;
 
 figure(1);
-baxter = createBaxter('CreateFrames','off');
+baxter = createBaxter(eye(3), [0;0;0], 'CreateFrames','off');
 axis equal;
 axis([-2 2 -2 2 -.85 1]);
+view([75 10]);
 
 %% Simple Animation
 
@@ -26,8 +27,8 @@ for k=1:length(t);
     qr(2) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
     qh(1) = sin(2*pi*t(k)); % head pan
     
-    baxter.left_arm = updateRobot(ql,baxter.left_arm);
-    baxter.right_arm = updateRobot(qr,baxter.right_arm);
-    baxter.head = updateRobot(qh,baxter.head);
+    q = {ql;qr;qh};
+    
+    baxter = updateRobot(q,baxter);
     drawnow;
 end

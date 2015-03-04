@@ -35,11 +35,11 @@ axis equal; axis([-1 1 -1 1 0 1]); grid on;
 %% Animate rolling across floor
 
 % time stepping of animation
-dt = 0.02;
-t = 0:dt:2;
+T = 4; dt = 0.02;
+t = 0:dt:T;
 
 % angular velocity of cylinder
-w = 2*pi;
+w = 3*pi/T;
 
 for k=1:length(t)
     % Calculate new rotation and position at time t(k)
@@ -50,5 +50,5 @@ for k=1:length(t)
     cyl = updateRigidBody(R,p,cyl);
     drawnow;
     t1 = toc;
-    pause(max(dt - t1,0));
+    while t1 < dt,   t1 = toc;   end
 end
