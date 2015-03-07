@@ -54,14 +54,14 @@ function sda10_const = defineMotomanSDA10(origin)
     torso.name = 'sda10_torso';
     
     left_arm.H = R0*[x0 y0 x0 y0 z0 y0 z0];
-    left_arm.P = R0*[[0.05;-.1;.35] .215*x0 ...
+    left_arm.P = R0*[[0.05;-.1;.3] .215*x0 ...
                         zed .36*x0 .36*z0 zed .155*z0 zed];
     left_arm.P(:,1) = t0 + left_arm.P(:,1);
     left_arm.joint_type = zeros(7,1);
     left_arm.name = 'sda10_left_arm';
     
     right_arm.H = R0*[x0 y0 x0 y0 z0 y0 z0];
-    right_arm.P = R0*[[-0.05;-.1;.35] -.215*x0 ...
+    right_arm.P = R0*[[-0.05;-.1;.3] -.215*x0 ...
                         zed -.36*x0 .36*z0 zed .155*z0 zed];
     right_arm.P(:,1) = t0 + right_arm.P(:,1);
     right_arm.joint_type = zeros(7,1);

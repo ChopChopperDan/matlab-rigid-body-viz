@@ -7,7 +7,7 @@
 %
 % Be sure to use rigidbodyviz_setup() before running
 
-clear all; close all;
+clear variables; close all;
 
 x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
 

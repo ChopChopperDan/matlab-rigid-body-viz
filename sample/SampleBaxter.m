@@ -6,7 +6,7 @@
 %
 % Be sure to use rigidbodyviz_setup() before running
 
-clear all; close all;
+clear variables; close all;
 
 figure(1);
 baxter = createBaxter(eye(3), [0;0;0], 'CreateFrames','off');

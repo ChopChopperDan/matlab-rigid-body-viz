@@ -6,7 +6,7 @@
 %
 % Be sure to use rigidbodyviz_setup() before running
 
-clear all; close all;
+clear variables; close all;
 
 % Define body
 cyl_param.radius = 0.1;

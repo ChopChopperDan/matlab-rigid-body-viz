@@ -69,9 +69,9 @@ function handle = createMotomanSDA10(R0, t0, varargin)
     torso.links(1).props = link_props;
     
     torso.links(2).radius = 0.12;
-    torso.links(2).height = 0.244;
-    torso.links(2).t0 = [0;-0.05;.175];
-    torso.links(2).R0 = rot(x0,0.2783);
+    torso.links(2).height = 0.19;
+    torso.links(2).t0 = rot(x0,18*pi/180)*(.19/2 + .05)*z0;
+    torso.links(2).R0 = rot(x0,18*pi/180);
     torso.links(2).props = link_props;
     
     left_arm.links(2).radius = 0.08;
