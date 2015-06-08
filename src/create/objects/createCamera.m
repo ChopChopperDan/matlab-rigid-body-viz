@@ -15,6 +15,7 @@ function handle = createCamera(R0, t0, param, varargin)
     %       createCuboid.m
     %       createCylinder.m
     %       attachPrefix.m
+    %       combineRigidBodies.m
     %
     % See Also CREATECUBOID, CREATECYLINDER
     %

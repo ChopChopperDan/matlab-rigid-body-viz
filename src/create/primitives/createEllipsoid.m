@@ -9,6 +9,8 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     %       [opt] radiusX
     %       [opt] radiusY
     %       [opt] radiusZ
+    %       [opt] n     (number of points for circle discretization)
+    %                       default = 12
     % possible additional properties are:
     %       'FaceColor'  default: [1;1;1]
     %       'FaceAlpha'  default: 1
@@ -62,10 +64,15 @@ function handle = createEllipsoid(R0,t0,param,varargin)
         handle = [];
         return;
     end
-    
+    % resolution of points for circle discretization
+    if isfield(param,'n')
+        n = param.n;
+    else
+        n = 12;
+    end
     
     % Vectices
-    n = 12; % resolution of points for circle discretization
+%     n = 12; 
     theta = 2*pi*(0:1/n:(n-1)/n);
     phi = pi*(0:1/n:1);
     
