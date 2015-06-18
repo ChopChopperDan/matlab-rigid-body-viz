@@ -1,33 +1,41 @@
 function handle = createRobot(R0, t0, robot, varargin)
+    % CREATEROBOT 
     %
-    % handle = createRobot(R0, t0, robot,...)
+    % handle = createRobot(R0, t0, robot, ...)
     %
     % purpose: creates a robot drawing object in zero configuration
     %
     % input:
     % R0 is 3 x 3 matrix for orientation of the base frame of the robot
     % t0 is 3 x 1 vector for base frame of the robot
-    % robot struct with parts:
+    % standard robot definition struct with fields:
+    %   name: string denoting the name of the robot
+    %   kin:
     %       H: [ h_1 h_2 ... h_n ] actuation axis for each joint
-    %       P: [p_01 p_12 p_23 .. p_{n-1}n ] inter-link vectors
+    %       P: [ p_01 p_12 p_23 .. p_{n-1}n ] inter-joint vectors
     %       joint_type:     0 = rotational  1 = prismatic 
     %                       2 = rotational (non-visible) 
     %                       3 = translational (non-visible)
-    %       joints: n dimensional struct with parameters 
-    %                describing each joint, including a 'props' field
-    %                       rotational: cylinder
-    %                       prismatic:  cuboid
-    %                       'non-visible' joints can be empty, 
-    %                                  will not be drawn
-    %       link_type: n + 1 dimensional vector describing 
-    %                   each type of link
-    %                       0 = no link
-    %                       1 = cylindrical link
-    %                       2 = cuboid link
-    %       links: (n + 1) dimensional struct with parameterization 
-    %               specific to each link type, including a 'props' field
-    %       name: string denoting the name of the robot
-    %       [opt] frame: parameters describing coordinate frames
+    %   vis:
+    %       joints: n dimensional struct array with fields
+    %              param: parameterization according to joint_type
+    %              props: visual properties
+    %       links: (n + 1) dimensional struct array with fields
+    %              handle:  function handle to object / primitive
+    %              R:       orientation from base drawing frame
+    %              t:       displacement from frame to origin of object
+    %              param:   parameterization according to handle
+    %              props:   visual properties
+    %               ** If no link is to be drawn, leave handle empty **
+    %       [opt] frame: single struct describing coordinate frames
+    %       [opt] peripherals: arbitrary length struct array with fields
+    %              id:      string id for peripheral
+    %              frame:   frame index this peripheral is attached to
+    %              handle:  function handle to object / primitive
+    %              R:       orientation from base drawing frame
+    %              t:       displacement from frame to origin of object
+    %              param:   parameterization according to handle
+    %              props:   visual properties
     %
     % Optional Additional Properties:
     %       'CreateFrames'          default: 'off'
@@ -40,7 +48,7 @@ function handle = createRobot(R0, t0, robot, varargin)
     %
     % returns handle to robot drawing object
     %
-    % see also UPDATEROBOT CREATEPARALLELJAWGRIPPER CREATE3DFRAME
+    % see also UPDATEROBOT CREATE3DFRAME
 
     % Walk through varargin
     for i=1:2:(nargin-3)
@@ -70,10 +78,10 @@ function handle = createRobot(R0, t0, robot, varargin)
     
     % Transform kinematics into desired coordinate system (these terms
     %       should be constant)
-    handle.robots.kin.H = R0*robot.H;
-    handle.robots.kin.P = R0*robot.P;
+    handle.robots.kin.H = R0*robot.kin.H;
+    handle.robots.kin.P = R0*robot.kin.P;
     handle.robots.kin.P(:,1) = handle.robots.kin.P(:,1) + t0;
-    handle.robots.kin.type = robot.joint_type;
+    handle.robots.kin.type = robot.kin.joint_type;
     
     % Placeholders for frame and load information
     handle.robots.frames = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
@@ -84,16 +92,12 @@ function handle = createRobot(R0, t0, robot, varargin)
     n_bodies = 0;
     
     % Create link p_01
-    if robot.link_type(1) > 0
-        Ri = R0*robot.links(1).R0;
-        ti = t0 + R0*robot.links(1).t0;
-        if robot.link_type(1) == 1
-            link = createCylinder(Ri, ti, robot.links(1), ...
-                                    robot.links(1).props{:});
-        elseif robot.link_type(1) == 2
-            link = createCuboid(Ri, ti, robot.links(1), ...
-                                    robot.links(1).props{:});
-        end
+    if ~isempty(robot.vis.links(1).handle)
+        Ri = R0*robot.vis.links(1).R;
+        ti = t0 + R0*robot.vis.links(1).t;
+        link = robot.vis.links(1).handle(Ri, ti, ...
+                                    robot.vis.links(1).param, ...
+                                    robot.vis.links(1).props{:});
     else
         link.bodies = [];
         link.labels = {};
@@ -126,81 +130,83 @@ function handle = createRobot(R0, t0, robot, varargin)
         else                Ri = rot(hat(z0)*h, acos(h(3)));
         end
         
-        if handle.robots.kin.type(i) == 0 
-            % rotational
-            joint = createCylinder(Ri, p, robot.joints(i), ...
-                                    robot.joints(i).props{:});
+        joint_name = [handle.robots.name '_joint' num2str(i) '_'];
+        if handle.robots.kin.type(i) == 0  % rotational
+            
+            joint = createCylinder(Ri, p, robot.vis.joints(i).param, ...
+                                    robot.vis.joints(i).props{:});
             % Add bodies/labels to master list
             handle.bodies = [handle.bodies joint.bodies];
             handle.labels = [handle.labels ...
-                attachPrefix([handle.robots.name '_joint' num2str(i) '_'], ...
-                                                        joint.labels)];
+                    attachPrefix(joint_name, joint.labels)];
             % Add pointers to body indices in the frame subfield
-            handle.robots.frames(i).bodies = n_bodies + ...
-                                        (1:numel(joint.bodies));
+            handle.robots.frames(i).bodies = ...
+                                    n_bodies + (1:numel(joint.bodies));
             n_bodies = n_bodies + numel(joint.bodies);
-        elseif handle.robots.kin.type(i) == 1 
-            % prismatic
-            joint = createPrismaticJoint(Ri, p, robot.joints(i), ...
-                                    robot.joints(i).props{:});
+            
+        elseif handle.robots.kin.type(i) == 1  % prismatic
+            
+            joint = createPrismaticJoint(Ri, p, robot.vis.joints(i).param, ...
+                                    robot.vis.joints(i).props{:});
             % Add bodies/labels to master list
             handle.bodies = [handle.bodies joint.bodies];
             handle.labels = [handle.labels ...
-                attachPrefix([handle.robots.name '_joint' num2str(i) '_'], ...
-                                                        joint.labels)];
+                    attachPrefix(joint_name, joint.labels)];
             
             % Add pointers to body indices in the frame subfield
+            % for prismatic, associate base with prior frame
             if (i > 1)
                 handle.robots.frames(i-1).bodies = ...
-                                [handle.robots.frames(i-1).bodies ...
-                                                n_bodies + 1];
+                        [handle.robots.frames(i-1).bodies, n_bodies + 1];
+            else
+                handle.robots.base.bodies = ...
+                        [handle.robots.base.bodies, n_bodies + 1];
             end
             handle.robots.frames(i).bodies = n_bodies + 2;
             n_bodies = n_bodies + numel(joint.bodies);
-        elseif any(handle.robots.kin.type(i) == [2 3])
-            % non-visible joints aren't drawn
+            
+        elseif any(handle.robots.kin.type(i) == [2 3]) % mobile
             handle.robots.frames(i).bodies = [];
         end
         
         % If drawing coordinate frames, draw one at joint i
+        %   Do not draw 'mobile' joint coordinate frames
         if strcmpi(cf,'on') && ~any(handle.robots.kin.type(i) == [2 3])
-            frame = create3DFrame(R,p, robot.frame);
+            frame = create3DFrame(R, p, robot.vis.frame);
             % Add bodies/labels to master list
+            frame_name = [handle.robots.name '_frame' num2str(i) '_'];
             handle.bodies = [handle.bodies frame.bodies];
             handle.labels = [handle.labels ...
-                attachPrefix([handle.robots.name '_frame' num2str(i) '_'], ...
-                                                        frame.labels)];
+                            attachPrefix(frame_name, frame.labels)];
             % Add pointers to body indices in the frame subfield
             handle.robots.frames(i).bodies = ...
-                    [handle.robots.frames(i).bodies ...
-                    n_bodies + (1:numel(frame.bodies))];
+                        [handle.robots.frames(i).bodies ...
+                        n_bodies + (1:numel(frame.bodies))];
             n_bodies = n_bodies + numel(frame.bodies);
         end
         
         % Create link p_{i,i+1}, if specified
-        if robot.link_type(i+1) > 0
-            Ri = R*robot.links(i+1).R0;
-            ti = p + R*robot.links(i+1).t0;
-            if robot.link_type(i+1) == 1
-                link = createCylinder(Ri, ti, robot.links(i+1), ...
-                                robot.links(i+1).props{:});
-            elseif robot.link_type(i+1) == 2
-                link = createCuboid(Ri, ti, robot.links(i+1), ...
-                                robot.links(i+1).props{:});
-            end
+        if ~isempty(robot.vis.links(i+1).handle)
+            Ri = R*robot.vis.links(i+1).R;
+            ti = p + R*robot.vis.links(i+1).t;
+            
+            link = robot.vis.links(i+1).handle(Ri, ti, ...
+                                    robot.vis.links(i+1).param, ...
+                                    robot.vis.links(i+1).props{:});
         else
             link.bodies = [];
             link.labels = {};
         end
         % Add bodies/labels to master list
+        link_name = [handle.robots.name '_link' num2str(i) '_'];
+        
         handle.bodies = [handle.bodies link.bodies];
         handle.labels = [handle.labels ...
-                attachPrefix([handle.robots.name '_link' num2str(i) '_'], ...
-                                                            link.labels)];
+                            attachPrefix(link_name , link.labels)];
         % Add pointers to body indices in the frame subfield
         handle.robots.frames(i).bodies = ...
-                [handle.robots.frames(i).bodies ...
-                n_bodies + (1:numel(link.bodies))];
+                    [handle.robots.frames(i).bodies ...
+                    n_bodies + (1:numel(link.bodies))];
         n_bodies = n_bodies + numel(link.bodies);
         
         % Pre-computed forward kinematics
@@ -216,15 +222,62 @@ function handle = createRobot(R0, t0, robot, varargin)
     
     % If drawing coordinate frames, draw one at position O_T
     if strcmpi(cf,'on')
-        frame = create3DFrame(R, p, robot.frame);
+        frame = create3DFrame(R, p, robot.vis.frame);
         % Add bodies/labels to master list
+        frame_name = [handle.robots.name '_frameT_'];
         handle.bodies = [handle.bodies frame.bodies];
         handle.labels = [handle.labels ...
-                attachPrefix([handle.robots.name '_frameT_'], frame.labels)];
+                    attachPrefix(frame_name, frame.labels)];
         % Add pointers to body indices in the frame subfield
         handle.robots.frames(nj+1).bodies = ...
                     [handle.robots.frames(nj+1).bodies ...
                     n_bodies + (1:numel(frame.bodies))];
+        
+        n_bodies = n_bodies + numel(frame.bodies);
+    end
+    
+    % If peripherals part of constants file, attach to robot
+    if isfield(robot.vis,'peripherals')
+        for n = 1:numel(robot.vis.peripherals)
+            % Get relative coordinate frame for peripheral to attach to
+            if isnumeric(robot.vis.peripherals(n).frame)
+                i = robot.vis.peripherals(n).frame;
+                Ri = R0*handle.robots.frames(i).R;
+                ti = handle.robots.frames(i).t;
+            elseif strcmp(robot.vis.peripherals(n).frame,'tool')
+                i = nj + 1;
+                Ri = R0*handle.robots.frames(i).R;
+                ti = handle.robots.frames(i).t;
+            elseif strcmp(robot.vis.peripherals(n).frame,'base')
+                i = 0;
+                Ri = R0;
+                ti = t0;
+            end
+
+            Rp = Ri*robot.vis.peripherals(n).R;
+            tp = ti + Ri*robot.vis.peripherals(n).t;
+
+            periph = robot.vis.peripherals(n).handle(Rp, tp, ...
+                                robot.vis.peripherals(n).param, ...
+                                robot.vis.peripherals(n).props{:});
+            % Add bodies/labels to master list
+            periph_name = [handle.robots.name '_' ...
+                            robot.vis.peripherals(n).id '_'];
+            handle.bodies = [handle.bodies periph.bodies];
+            handle.labels = [handle.labels ...
+                        attachPrefix(periph_name, periph.labels)];
+            % Add pointers to body indices in the frame subfield
+            if i == 0
+                handle.robots.base.bodies = ...
+                            [handle.robots.base.bodies ...
+                            n_bodies + (1:numel(periph.bodies))];
+            else
+                handle.robots.frames(i).bodies = ...
+                            [handle.robots.frames(i).bodies ...
+                            n_bodies + (1:numel(periph.bodies))];
+            end
+
+        end
     end
         
 end
