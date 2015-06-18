@@ -64,15 +64,12 @@ function handle = createEllipsoid(R0,t0,param,varargin)
         handle = [];
         return;
     end
-    % resolution of points for circle discretization
-    if isfield(param,'n')
-        n = param.n;
-    else
-        n = 12;
+    % resolution of points for angular discretization
+    if isfield(param,'n'),   n = param.n;
+    else                     n = 12;
     end
     
     % Vectices
-%     n = 12; 
     theta = 2*pi*(0:1/n:(n-1)/n);
     phi = pi*(0:1/n:1);
     

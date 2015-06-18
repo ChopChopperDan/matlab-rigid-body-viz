@@ -8,6 +8,8 @@ function handle = updateRigidBody(R, t, handle)
     %
     % returns updated structure
     
+    % As a safety precaution, make sure the updated handle is returned.
+    %   Breaks the system, otherwise.
     if isempty(handle);  return;  end
     if nargout ~= 1; error('Must have return value for handle'); end;
     

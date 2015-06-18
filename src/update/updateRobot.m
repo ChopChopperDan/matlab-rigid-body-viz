@@ -4,22 +4,34 @@ function handle = updateRobot(theta, handle)
     %
     % theta is a cell containing vectors for the joint displacements 
     %       of all robots within the handle
-    %           theta = { [robot 1 joint angles] 
-    %                       ... 
-    %                     [robot n joint angles] }
+    %    theta = { [robot 1 joint angles] 
+    %                     ... 
+    %              [robot n joint angles] }
     %       -> in the case of only a single chain robot, can just be a
     %       single vector
-    %           theta = [robot joint angles]
+    %    theta = [robot joint angles]
     %       -> in the case of branched robots, should have nested cells
-    %           theta = { [robot 1 joint angles]
-    %                       { [robot 2 joint angles]
-    %                         [robot 2_1 joint angles]
-    %                           { [robot 2_2 joint angles] 
-    %                             [robot 2_2_1 joint angles]
-    %                             [robot 2_2_2 joint angles]
-    %                             [robot 2_2_3 joint angles] } }
-    %                      ...
-    %                     [robot n joint_angles] }
+    %               expected in correct kinematic order.
+    %    theta = { [robot 1 joint angles]
+    %                 { [robot 2 joint angles]
+    %                   [robot 2_1 joint angles]
+    %                   { [robot 2_2 joint angles] 
+    %                        [robot 2_2_1 joint angles]
+    %                        [robot 2_2_2 joint angles]
+    %                        [robot 2_2_3 joint angles] } }
+    %                ...
+    %              [robot n joint_angles] }
+    %       -> in the case of branched robots, should have nested cells
+    %               with the frame name as the identifier.
+    %    theta = { robot 1 id, [robot 1 joint angles]
+    %                { robot 2 id, [robot 2 joint angles]
+    %                  robot 2_1 id, [robot 2_1 joint angles]
+    %                    { robot 2_2 id, [robot 2_2 joint angles] 
+    %                      robot 2_2_1 id, [robot 2_2_1 joint angles]
+    %                      robot 2_2_2 id, [robot 2_2_2 joint angles]
+    %                      robot 2_2_3 id, [robot 2_2_3 joint angles] } }
+    %                 ...
+    %              robot n id, [robot n joint_angles] }
     %                       
     % handle is handle to drawing structure containing a 'robots' field.  
     %
