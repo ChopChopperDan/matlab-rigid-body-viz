@@ -9,7 +9,7 @@
     %
     % Optional parameters for initialization are:
     %       'CreateFrames'      default: 'off'
-    %       'CreatePedestal'    default: 'off'
+    %       'CreatePedestal'    default: 'on'
     %
     % returns handle to the baxter structure containing three branched 
     % robots:
@@ -18,21 +18,14 @@
     %       baxter_head
     %
     % see also DEFINEBAXTER CREATEROBOT
-        
-    % Walk through varargin
-    for i=1:2:(nargin-2)
-        if strcmp(varargin{i},'CreateFrames')
-            cf = varargin{i+1};
-        elseif strcmp(varargin{i},'CreatePedestal')
-            cp = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Default settings to optional parameters
-    if ~exist('cf','var'); cf = 'off'; end
-    if ~exist('cp','var'); cp = 'on'; end
     
+    flags = {'CreateFrames', 'CreatePedestal'};
+    defaults = {'off', 'on'};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    cf = opt_values{1};
+    cp = opt_values{2};
+        
     zed = [0;0;0];
     
     baxter_def = defineBaxter([R0 t0; zed' 1], 'Pedestal', cp);

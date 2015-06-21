@@ -19,17 +19,12 @@ function handle = createMotomanSDA10D(R0, t0, varargin)
     %
     % see also DEFINEMOTOMANSDA10D
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'CreateFrames')
-            cf = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Default settings to optional parameters
-    if ~exist('cf','var'); cf = 'off'; end
-
+    flags = {'CreateFrames'};
+    defaults = {'off'};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    cf = opt_values{1};
+    
     zed = [0;0;0];
     
     % Define Kinematics for the arms 

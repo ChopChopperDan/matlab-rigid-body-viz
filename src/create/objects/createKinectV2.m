@@ -1,6 +1,6 @@
 function handle = createKinectV2(R0, t0, param, varargin)
     % CREATEKINECTV2
-    %   handle = createKinectV2(R0, t0, ...)
+    %   handle = createKinectV2(R0, t0, param, ...)
     %
     % R0 is the 3x3 orientation matrix for the Kinect
     % t0 is the 3x1 origin of the Kinect in the world frame
@@ -27,18 +27,12 @@ function handle = createKinectV2(R0, t0, param, varargin)
     %
     % returns handle to drawing structure 
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'Color')
-            c = varargin{i+1};
-        elseif strcmp(varargin{i},'Alpha')
-            a = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    if ~exist('c','var'); c = [0;0;0]; end
-    if ~exist('a','var'); a = 1; end
+    flags = {'Color', 'Alpha'};
+    defaults = {[0;0;0], 1};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    c = opt_values{1};
+    a = opt_values{2};
     
     % define body parameterization
     base_param.width = .25;

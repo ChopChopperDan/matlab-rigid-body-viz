@@ -21,16 +21,12 @@ function handle = createCamera(R0, t0, param, varargin)
     %
     % returns handle to drawing structure
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'Color')
-            c = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    if ~exist('c','var'); c = [0;0;0]; end
+    flags = {'Color'};
+    defaults = {[0;0;0]};
     
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    c = opt_values{1};
+        
     z0 = [0;0;1];
     
     t0_lens = t0 - 1/2*param.lens.height*R0*z0;

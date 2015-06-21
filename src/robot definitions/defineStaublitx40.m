@@ -1,9 +1,9 @@
 function tx40_const = defineStaublitx40(origin)
     %
     % tx40_const = defineStaublitx40()
-    % tx40_const = defineStaublitx40(origin) - origin is [4 x 4] matrix
-    % denoting orientation and translation of Staubli tx40 with respect 
-    % to the world frame
+    % tx40_const = defineStaublitx40(origin) - allows additional optional
+    %                                    parameters
+    %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
     %
     % define-file for the Staubli tx40 Robot.  Returns struct with the
     % following form:
@@ -36,7 +36,11 @@ function tx40_const = defineStaublitx40(origin)
     
     x0 = [1;0;0]; z0 = [0;0;1]; zed = [0;0;0];
     
-    if nargin == 0, origin = [eye(3) zed; zed' 1];  end
+    flags = {'Origin'};
+    defaults = {[eye(3) zed; zed' 1]};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    origin = opt_values{1};
     
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);

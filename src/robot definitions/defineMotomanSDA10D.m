@@ -1,9 +1,9 @@
 function sda10_const = defineMotomanSDA10D(origin)
     %
     % sda10_const = defineMotomanSDA10D()
-    % sda10_const = defineMotomanSDA10D(origin) - origin is [4 x 4] matrix
-    % denoting orientation and translation of Motoman SDA10 with respect 
-    % to the world frame
+    % sda10_const = defineMotomanSDA10D(origin) - allows additional optional
+    %                                    parameters
+    %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
     %
     % define-file for the Motoman SDA10D Robot.  Returns struct with the
     % following form:
@@ -57,7 +57,12 @@ function sda10_const = defineMotomanSDA10D(origin)
     %   see also CREATEMOTOMANSDA10D
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
-    if ~exist('origin','var'); origin = [eye(3) zed; zed' 1]; end
+    
+    flags = {'Origin'};
+    defaults = {[eye(3) zed; zed' 1]};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    origin = opt_values{1};
     
     R0 = origin(1:3,1:3); t0 = origin(1:3,4);
     

@@ -25,15 +25,11 @@ function handle = createTable(R0, t0, param, varargin)
     %
     % see also CREATECUBOID
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'Color')
-            c = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    if ~exist('c','var'); c = [0.8235;0.6627;0.1765]; end
+    flags = {'Color'};
+    defaults = {[0.8235;0.6627;0.1765]};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    c = opt_values{1};
     
     surf_param = param.surface_param;    
     leg_param = param.leg_param;

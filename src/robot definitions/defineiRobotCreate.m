@@ -1,11 +1,10 @@
-function create_const = defineiRobotCreate(origin, varargin)
+function create_const = defineiRobotCreate(varargin)
     %
     % create_const = defineiRobotCreate()
-    % create_const = defineiRobotCreate(origin) - origin is [4 x 4] matrix
-    % denoting orientation and translation of Staubli tx40 with respect 
-    % to the world frame
-    % create_const = defineiRobotCreate(origin, 'Color', color) - default
-    % color is [0.9 0.9 0.9]
+    % create_const = defineiRobotCreate(...) - allows additional optional
+    %                                    parameters
+    %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
+    %       'Color'         :   default [0.9 0.9 0.9]
     %
     % define-file for the iRobot Create mobile robot.  Returns struct with
     % the following form:
@@ -36,17 +35,12 @@ function create_const = defineiRobotCreate(origin, varargin)
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'Color')
-            c = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Default settings to optional parameters
-    if ~exist('c','var'); c = [.9;0.9;0.9]; end
-    if nargin == 0, origin = [eye(3) zed; zed' 1];  end
+    flags = {'Origin', 'Color'};
+    defaults = {[eye(3) zed; zed' 1], [0.9 0.9 0.9]};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    origin = opt_values{1};
+    c = opt_values{2};
     
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);

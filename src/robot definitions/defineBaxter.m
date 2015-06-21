@@ -1,11 +1,9 @@
-function baxter_const = defineBaxter(origin, varargin)
+function baxter_const = defineBaxter(varargin)
     %
     % baxter_const = defineBaxter()
-    % baxter_const = defineBaxter(origin,...) - origin is [4 x 4] matrix
-    % denoting orientation and translation of Baxter with respect to the
-    % world frame
-    %
-    % Additional Optional Parameters
+    % baxter_const = defineBaxter(...) - allows additional optional
+    %                                    parameters
+    %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
     %       'Pedestal'      :   'on'/'off' (default on)
     %
     % define-file for the Rethink Robotics Baxter.  Returns struct with the
@@ -62,20 +60,15 @@ function baxter_const = defineBaxter(origin, varargin)
     %
     %   see also CREATEBAXTER 
     
-    % Walk through varargin
-    for i=1:2:(nargin-2)
-        if strcmp(varargin{i},'Pedestal')
-            cp = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Default settings to optional parameters
-    if ~exist('cp','var'); cp = 'on'; end
-    
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
-    if ~exist('origin','var'); origin = [eye(3) zed; zed' 1]; end
+    
+    flags = {'Origin', 'Pedestal'};
+    defaults = {[eye(3) zed; zed' 1], 'on'};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    origin = opt_values{1};
+    cp = opt_values{2};
 
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);

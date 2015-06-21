@@ -24,21 +24,13 @@ function handle = createArrow(R0, t0, param, varargin)
 %
 %   retursn handle to drawing structure
 
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'Color')
-            c = varargin{i+1};
-        elseif strcmp(varargin{i},'FaceAlpha')
-            fa = varargin{i+1};
-        elseif strcmp(varargin{i},'EdgeAlpha')
-            ea = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    if ~exist('c','var'); c = [0;0;0]; end
-    if ~exist('fa','var'); fa = 1; end
-    if ~exist('ea','var'); ea = 1; end
+    flags = {'Color', 'FaceAlpha', 'EdgeAlpha'};
+    defaults = {[0;0;0], 1, 0};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    c = opt_values{1};
+    fa = opt_values{2};
+    ea = opt_values{3};
     
     z0 = [0;0;1];
     

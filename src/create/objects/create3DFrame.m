@@ -18,19 +18,12 @@ function handle = create3DFrame(R0, t0, param, varargin)
     %
     % returns handle to drawing structure
     
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'FaceAlpha')
-            fa = varargin{i+1};
-        elseif strcmp(varargin{i},'EdgeAlpha')
-            ea = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Set default values
-    if ~exist('fa','var'); fa = 1; end
-    if ~exist('ea','var'); ea = 0; end
+    flags = {'FaceAlpha', 'EdgeAlpha'};
+    defaults = {1, 0};
+    
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    fa = opt_values{1};
+    ea = opt_values{2};
     
     axis_param.radius = param.width/2;
     axis_param.height = param.scale;

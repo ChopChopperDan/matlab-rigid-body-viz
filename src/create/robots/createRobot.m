@@ -13,7 +13,8 @@ function handle = createRobot(R0, t0, robot, varargin)
     %   kin:
     %       H: [ h_1 h_2 ... h_n ] actuation axis for each joint
     %       P: [ p_01 p_12 p_23 .. p_{n-1}n ] inter-joint vectors
-    %       joint_type:     0 = rotational  1 = prismatic 
+    %       joint_type:     0 = rotational  
+    %                       1 = prismatic 
     %                       2 = rotational (non-visible) 
     %                       3 = translational (non-visible)
     %   vis:
@@ -50,17 +51,12 @@ function handle = createRobot(R0, t0, robot, varargin)
     %
     % see also UPDATEROBOT CREATE3DFRAME
 
-    % Walk through varargin
-    for i=1:2:(nargin-3)
-        if strcmp(varargin{i},'CreateFrames')
-            cf = varargin{i+1};
-        else
-            error(['Parameter not recognized: ' varargin{i}]);
-        end
-    end
-    % Default settings to optional parameters
-    if ~exist('cf','var'), cf = 'off'; end
+    flags = {'CreateFrames', 'Color'};
+    defaults = {'off'};
     
+    opt_values = mrbv_parse_input(varargin, flags, defaults);
+    cf = opt_values{1};
+        
     % Normal orientation for actuation axis on primitive shapes
     z0 = [0;0;1];
     
