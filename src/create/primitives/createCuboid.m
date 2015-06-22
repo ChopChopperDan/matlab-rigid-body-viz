@@ -1,4 +1,5 @@
 function handle = createCuboid(R0, t0, param, varargin)
+    % CREATECUBOID
     %
     % handle = createCuboid(R0, t0, param,...)
     %

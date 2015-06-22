@@ -1,4 +1,5 @@
 function handle = createPrism(R0, t0, param, varargin)
+    % CREATEPRISM
     %
     % handle = createPrism(R0, t0, param,...)
     %

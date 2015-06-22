@@ -1,4 +1,5 @@
 function handle = createEllipsoid(R0,t0,param,varargin)
+    % CREATEELLIPSOID
     %
     % handle = createEllipsoid(R0, t0, param,...)
     %
