@@ -28,7 +28,7 @@
         
     zed = [0;0;0];
     
-    baxter_def = defineBaxter([R0 t0; zed' 1], 'Pedestal', cp);
+    baxter_def = defineBaxter('Origin', [R0 t0; zed' 1], 'Pedestal', cp);
     
     %%%%%% Create robot objects %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     h_left_arm = createRobot(eye(3), zed, baxter_def.left_arm_const,...

@@ -12,7 +12,7 @@ function handle = createRobot(R0, t0, robot, varargin)
     %   name: string denoting the name of the robot
     %   kin:
     %       H: [ h_1 h_2 ... h_n ] actuation axis for each joint
-    %       P: [ p_01 p_12 p_23 .. p_{n-1}n ] inter-joint vectors
+    %       P: [ p_{0,1} p_{1,2} .. p_{n-1,n} p_{n,T] inter-joint vectors
     %       joint_type:     0 = rotational  
     %                       1 = prismatic 
     %                       2 = rotational (non-visible) 
@@ -51,7 +51,7 @@ function handle = createRobot(R0, t0, robot, varargin)
     %
     % see also UPDATEROBOT CREATE3DFRAME
 
-    flags = {'CreateFrames', 'Color'};
+    flags = {'CreateFrames'};
     defaults = {'off'};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);

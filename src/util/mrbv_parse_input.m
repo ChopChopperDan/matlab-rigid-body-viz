@@ -11,8 +11,10 @@ function argout = mrbv_parse_input(argin, flags, defaults)
     %       matches the passed value within 'argin' or sets itself to the
     %       provided value in 'defaults'
     
+    
     % set output to defaults and extract argin into flags and values.
     argout = defaults;
+    if isempty(argin),   return;  end
     in_flags = argin(1:2:end);
     in_values = argin(2:2:end);
     

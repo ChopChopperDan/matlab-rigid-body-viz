@@ -28,7 +28,7 @@ function handle = createMotomanSDA10D(R0, t0, varargin)
     zed = [0;0;0];
     
     % Define Kinematics for the arms 
-    sda10_const = defineMotomanSDA10D([R0 t0; zed' 1]);
+    sda10_const = defineMotomanSDA10D('Origin',[R0 t0; zed' 1]);
     
     % Build individual robot structures
     h_torso = createRobot(eye(3), zed, sda10_const.torso_const, ...
