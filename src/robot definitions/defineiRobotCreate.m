@@ -127,4 +127,4 @@ function create_const = defineiRobotCreate(varargin)
                                                     'height',0.02);
     create_const.vis.peripherals(4).props = {'FaceColor',[0;0;0]};
     
-    
+end

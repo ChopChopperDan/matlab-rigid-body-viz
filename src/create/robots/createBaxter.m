@@ -1,4 +1,4 @@
-    function handle = createBaxter(R0, t0, varargin)
+function handle = createBaxter(R0, t0, varargin)
     % 
     % h_baxter = createBaxter(R0, t0, ...)
     %
