@@ -96,6 +96,7 @@ function handle = createParallelJawGripper(R0, t0, param, varargin)
     right_jaw = createRobot(eye(3), [0;0;0], right_jaw_const, ...
                                         'CreateFrames','off');
     % combine robots into single branched robot handle
-    handle = branchRobots(left_jaw, right_jaw);    
+%     handle = branchRobots(left_jaw, right_jaw);    
+    handle = combineRobots(left_jaw, right_jaw, 'root');
     
 end

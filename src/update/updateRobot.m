@@ -2,151 +2,145 @@ function handle = updateRobot(theta, handle)
     %
     % handle = updateRobot(theta, handle)
     %
-    % theta is a cell containing vectors for the joint displacements 
-    %       of all robots within the handle
-    %    theta = { [robot 1 joint angles] 
-    %                     ... 
-    %              [robot n joint angles] }
-    %       -> in the case of only a single chain robot, can just be a
-    %       single vector
-    %    theta = [robot joint angles]
-    %       -> in the case of branched robots, should have nested cells
-    %               expected in correct kinematic order.
-    %    theta = { [robot 1 joint angles]
-    %                 { [robot 2 joint angles]
-    %                   [robot 2_1 joint angles]
-    %                   { [robot 2_2 joint angles] 
-    %                        [robot 2_2_1 joint angles]
-    %                        [robot 2_2_2 joint angles]
-    %                        [robot 2_2_3 joint angles] } }
-    %                ...
-    %              [robot n joint_angles] }
-    %       -> in the case of branched robots, should have nested cells
-    %               with the frame name as the identifier.
-    %    theta = { robot 1 id, [robot 1 joint angles]
-    %                { robot 2 id, [robot 2 joint angles]
-    %                  robot 2_1 id, [robot 2_1 joint angles]
-    %                    { robot 2_2 id, [robot 2_2 joint angles] 
-    %                      robot 2_2_1 id, [robot 2_2_1 joint angles]
-    %                      robot 2_2_2 id, [robot 2_2_2 joint angles]
-    %                      robot 2_2_3 id, [robot 2_2_3 joint angles] } }
-    %                 ...
-    %              robot n id, [robot n joint_angles] }
+    % theta is a structure containing the actuator displacements for all
+    %       robots that need updating.  The fields must have the form
+    %   root
+    %       -> names    : cell string array containing each robot to be
+    %                       updated **Does not need to be every robot
+    %                       defined with the robot structure**
+    %                       {'robot 1', 'robot 2', ... , 'robot n'}
+    %       -> states   : cell array containing the displacements for each
+    %                       robot named in the 'names' field.
+    %                       {theta_1, theta_2, ... , theta_n}
     %                       
-    % handle is handle to drawing structure containing a 'robots' field.  
+    % handle is the robot drawing structure that needs updating.  Returns
+    %       the updated structure.
     %
     % depends on
     %           updateRigidBody.m
     %
-    % returns updated handle
-    %
     % see also UPDATERIGIDBODY CREATEROBOT
     
-    % leaf node within robot structure, exit case
-    if ~isfield(handle,'robots') || isempty(handle.robots)
-        return; 
+    % check correctness of theta input
+    if ~isfield(theta,'names') || ~isfield(theta,'states')
+        error('updateRobot:incorrect_struct', ...
+                    'theta must have fields "names" and "states"');  
+    end
+    if ~iscellstr(theta.names) || ~iscell(theta.states)
+        error('updateRobot:incorrect_field_types', ...
+                    '"names", "states" must be cell arrays');
+    end
+    if numel(theta.names) ~= numel(theta.states)
+        error('updateRobot:incorrect_theta_dimensions', ...
+                'theta fields "names" and "states" must be equal size');
     end
     
-    if iscell(theta)
-        % Step through root for robots and send their information into the 
-        %   recursive function
-        for i=1:numel(handle.robots)
-            handle.robots(i) = updateRobotRecursive(handle.robots(i), ...
-                                                handle.bodies, ...
-                                                theta{i}, ...
-                                                handle.R, handle.t);
-        end
-    else
-        % Assume single serial-arm robot
-        handle.robots = updateRobotRecursive(handle.robots, ...
-                                                handle.bodies, ...
-                                                theta, ...
-                                                handle.R, handle.t);
+    for i=1:numel(handle.robots)
+        handle = updateSingleRobot(theta, handle, handle.robots(i).name);
     end
     
+        
 end
 
-function handle = updateRobotRecursive(handle, bodies, theta, R0, t0)
+function handle = updateSingleRobot(theta, handle, name)
     % Calculate forward kinematics for this serial chain
-    %   If robot branches further, expecting a cell object for theta
-    %   If robot is a leaf, expecting a simple array of displacements
-    if iscell(theta)
-        q = theta{1};
-    else
-        q = theta;
-    end
-    % Compute forward kinematics, update the bodies associated with each
-    % frame, and store the local transformations to the parent
-    % compute forward kinematics and update bodies attached to each 
-    %   joint's frame
     
-    % update bodies attached to the base frame
-    frame.bodies = bodies(handle.base.bodies);
-    frame.R = handle.base.R;
-    frame.t = handle.base.t;
-    frame = updateRigidBody(R0,t0,frame);
-        
+    % Locate robot index via passed name parameter
+    idx = strcmpi({handle.robots.name},name);
+    robot = handle.robots(idx);
+    
+    % Extract relevant information from theta
+    theta_idx = strcmpi(theta.names,name);
+    if theta_idx == 0 
+        % If name isn't found in theta to update, use same saved angles
+        q = robot.kin.state;
+    else
+        q = theta.states{idx};
+    end
+    
+    % Need base structure coordinate frame
+    R0 = handle.R;
+    t0 = handle.t;
+    
+    % Look at left handle to see lower kinematic chain and current position
+    % for the base of the robot
+    if strcmpi(robot.left,'root')
+        Ri = eye(3);
+        ti = [0;0;0];
+    else
+        left_idx = strcmpi({handle.robots.name},robot.left);
+        Ri = handle.robots(left_idx).frames(end).R;
+        ti = handle.robots(left_idx).frames(end).t;
+    end
+    
+    % create dummy rigidbody struct for updateRigidBody
+    frame = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
+    
+    % update base frame
+    frame.bodies = handle.bodies(robot.base.bodies);
+    frame.R = R0*robot.base.R;
+    frame.t = t0 + R0*robot.base.t;
+    frame = updateRigidBody(R0*Ri,t0 + R0*ti,frame);
+    handle.robots(idx).base.R = Ri;
+    handle.robots(idx).base.t = ti;
+    
+    % Update each coordinate frame along serial chain
     R = eye(3);
-    t = handle.kin.P(:,1);
-    for i=1:length(handle.kin.type)
-        if any(handle.kin.type(i) == [0 2]) % rotational
-            R = R*rot(handle.kin.H(:,i),q(i));
-        elseif any(handle.kin.type(i) == [1 3]) % prismatic
-            t = t + R*handle.kin.H(:,i)*q(i);
+    t = robot.kin.P(:,1);
+    for i=1:length(robot.kin.joint_type)
+        if (robot.kin.joint_type(i) == 0 || ...
+            robot.kin.joint_type(i) == 2) % rotational
+            R = R*rot(robot.kin.H(:,i),q(i));
+        elseif (robot.kin.joint_type(i) == 1 || ...
+                robot.kin.joint_type(i) == 3) % translational
+            t = t + R*robot.kin.H(:,i)*q(i);
         end
         % build 'rigidbody' structure to send to updateRigidBody
-        frame.bodies = bodies(handle.frames(i).bodies);
-        frame.R = handle.base.R*handle.frames(i).R;
-        frame.t = handle.base.t + handle.base.R*handle.frames(i).t;
-        frame = updateRigidBody(R0*R,t0 + R0*t,frame);
-        % Store local transformation from base frame of robot
-        handle.frames(i).R = R;
-        handle.frames(i).t = t;
+        frame.bodies = handle.bodies(robot.frames(i).bodies);
+        frame.R = R0*robot.base.R*robot.frames(i).R;
+        frame.t = t0 + R0*(robot.base.t + robot.base.R*robot.frames(i).t);
+        frame = updateRigidBody(R0*Ri*R,t0 + R0*(ti + Ri*t),frame);
+        % Store updated frame coordinates
+        handle.robots(idx).frames(i).R = R;
+        handle.robots(idx).frames(i).t = t;
         
         % update p for next frame
-        t = t + R*handle.kin.P(:,i+1);
+        t = t + R*robot.kin.P(:,i+1);
     end
-    % Update tool frame
-    frame.bodies = bodies(handle.frames(end).bodies);
-    frame.R = handle.base.R*handle.frames(end).R;
-    frame.t = handle.base.t + handle.base.R*handle.frames(end).t;
-    frame = updateRigidBody(R0*R,t0 + R0*t,frame);
+    % Update tool frame    
+    frame.bodies = handle.bodies(robot.frames(end).bodies);
+    frame.R = R0*robot.base.R*robot.frames(end).R;
+    frame.t = t0 + R0*(robot.base.t + robot.base.R*robot.frames(end).t);
+    frame = updateRigidBody(R0*Ri*R,t0 + R0*(ti + Ri*t),frame);
+    handle.robots(idx).frames(end).R = R;
+    handle.robots(idx).frames(end).t = t;
     
     % Update load attached to tool if exists
-    if ~isempty(handle.load)
-        frame.bodies = bodies(handle.load.bodies);
-        frame.R = handle.base.R*handle.frames(end).R*handle.load.Rb;
-        frame.t = handle.base.t + handle.base.R*(handle.frames(end).t + ...
-                            handle.frames(end).R*handle.load.tb);
-        RL = R0*R*handle.load.Rb;
-        tL = t0 + R0*(t + R*handle.load.tb);
-        frame = updateRigidBody(RL, tL, frame);
-        % Update local transformation from base frame
-        handle.load.R = R0*R*handle.load.Rb;
-        handle.load.t = t0 + R0*(t + R*handle.load.tb);
+    if ~isempty(robot.load)
+        frame.bodies = handle.bodies(robot.load.bodies);
+        frame.R = R0*robot.base.R*robot.load.R;
+        frame.t = t0 + R0*(robot.base.t + robot.base.R*robot.load.t);
+        Rl = R*robot.load.Rb;
+        tl = t + R*robot.load.tb;
+        [~] = updateRigidBody(R0*Ri*Rl, t0 + R0*(ti + Ri*tl), frame);
+        % Update load frame
+        handle.robots(idx).load.R = Rl;
+        handle.robots(idx).load.t = tl;
     end
-    % Update local transformation from base frame for tool frame
-    handle.frames(end).R = R;
-    handle.frames(end).t = t;
     
-    % Update transformation from root frame to robot base frame
-    handle.base.R = R0;
-    handle.base.t = t0;
-    
+    % Store new state in handle
+    handle.robots(idx).kin.state = q;
+        
     % Check whether the handle is a leaf, in which case we can return, or
-    % whether we need to step down to a lower branch
-    if ~isfield(handle,'robots') || isempty(handle.robots)
+    % whether we need to continue into higher kinematics
+    if isempty(robot.right)
         % found a leaf, can return
         return;
     else
-        % pass information to lower branch and update the transformation
-        % terms of the lower branch to reflect the local transformation
-        % from the base frame to the end of this serial chain
-        for i=1:numel(handle.robots)
-            handle.robots(i) = updateRobotRecursive(handle.robots(i), ...
-                                                    bodies, ...
-                                                    theta{i+1}, ...
-                                                    R0*R, t0+R0*t);
+        % pass information to 'right' kinematic branches that extend into
+        % higher kinematics.
+        for i=1:numel(robot.right)
+            handle = updateSingleRobot(theta, handle, robot.right{i});
         end
     end
     

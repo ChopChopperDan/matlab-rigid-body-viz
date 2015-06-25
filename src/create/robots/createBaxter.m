@@ -1,6 +1,6 @@
 function handle = createBaxter(R0, t0, varargin)
     % 
-    % h_baxter = createBaxter(R0, t0, ...)
+    % handle = createBaxter(R0, t0, ...)
     %
     % File to create a Baxter drawing object.  The Baxter robot 
     % consists of three serial chain robots representing the two arms and 

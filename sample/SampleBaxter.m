@@ -23,8 +23,8 @@ qr = zeros(7,1); % right arm joint angles
 qh = 0; % head pan angle
 
 for k=1:length(t);    
-    ql(2) = pi/4*sin(2*pi*t(k)); % s1 in left arm
-    qr(2) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
+    ql(4) = pi/4*sin(2*pi*t(k)); % s1 in left arm
+    qr(4) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
     qh(1) = sin(2*pi*t(k)); % head pan
     
     q = {ql;qr;qh};

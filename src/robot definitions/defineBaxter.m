@@ -254,7 +254,7 @@ function baxter_const = defineBaxter(varargin)
     
     head_const.vis.links(1).handle = @createCuboid;
     head_const.vis.links(1).R = eye(3);
-    head_const.vis.links(1).t = [-.01;0;.26];
+    head_const.vis.links(1).t = t0 + [-.01;0;.26];
     head_const.vis.links(1).param = ...
                     struct('width',0.33, 'length',0.31,'height',.52);
     head_const.vis.links(1).props = {'FaceColor', [.2;0.2;0.2], ...

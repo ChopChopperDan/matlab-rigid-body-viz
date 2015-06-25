@@ -77,12 +77,17 @@ function handle = createRobot(R0, t0, robot, varargin)
     handle.robots.kin.H = R0*robot.kin.H;
     handle.robots.kin.P = R0*robot.kin.P;
     handle.robots.kin.P(:,1) = handle.robots.kin.P(:,1) + t0;
-    handle.robots.kin.type = robot.kin.joint_type;
+    handle.robots.kin.joint_type = robot.kin.joint_type;
+    handle.robots.kin.state = zeros(size(robot.kin.joint_type));
     
     % Placeholders for frame and load information
     handle.robots.frames = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
     handle.robots.base = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
     handle.robots.load = [];
+    
+    % Default placeholders for branching information
+    handle.robots.left = 'root';
+    handle.robots.right = {};
     
     % Counter for the number of bodies
     n_bodies = 0;
@@ -114,7 +119,7 @@ function handle = createRobot(R0, t0, robot, varargin)
     R = R0; 
     
     % Fill the terms relating bodies to each frame within the robot
-    for i=1:length(handle.robots.kin.type)
+    for i=1:length(handle.robots.kin.joint_type)
         
         % Update the frame position and orientation
         handle.robots.frames(i).R = eye(3);
@@ -127,7 +132,7 @@ function handle = createRobot(R0, t0, robot, varargin)
         end
         
         joint_name = [handle.robots.name '_joint' num2str(i) '_'];
-        if handle.robots.kin.type(i) == 0  % rotational
+        if handle.robots.kin.joint_type(i) == 0  % rotational
             
             joint = createCylinder(Ri, p, robot.vis.joints(i).param, ...
                                     robot.vis.joints(i).props{:});
@@ -140,7 +145,7 @@ function handle = createRobot(R0, t0, robot, varargin)
                                     n_bodies + (1:numel(joint.bodies));
             n_bodies = n_bodies + numel(joint.bodies);
             
-        elseif handle.robots.kin.type(i) == 1  % prismatic
+        elseif handle.robots.kin.joint_type(i) == 1  % prismatic
             
             joint = createPrismaticJoint(Ri, p, robot.vis.joints(i).param, ...
                                     robot.vis.joints(i).props{:});
@@ -161,13 +166,13 @@ function handle = createRobot(R0, t0, robot, varargin)
             handle.robots.frames(i).bodies = n_bodies + 2;
             n_bodies = n_bodies + numel(joint.bodies);
             
-        elseif any(handle.robots.kin.type(i) == [2 3]) % mobile
+        elseif any(handle.robots.kin.joint_type(i) == [2 3]) % mobile
             handle.robots.frames(i).bodies = [];
         end
         
         % If drawing coordinate frames, draw one at joint i
         %   Do not draw 'mobile' joint coordinate frames
-        if strcmpi(cf,'on') && ~any(handle.robots.kin.type(i) == [2 3])
+        if strcmpi(cf,'on') && ~any(handle.robots.kin.joint_type(i) == [2 3])
             frame = create3DFrame(R, p, robot.vis.frame);
             % Add bodies/labels to master list
             frame_name = [handle.robots.name '_frame' num2str(i) '_'];
@@ -209,7 +214,7 @@ function handle = createRobot(R0, t0, robot, varargin)
         p = P(:,i+1);
     end
     
-    nj = length(handle.robots.kin.type);
+    nj = length(handle.robots.kin.joint_type);
     
     % Add final frame at O_T
     handle.robots.frames(nj+1).bodies = [];
@@ -272,7 +277,7 @@ function handle = createRobot(R0, t0, robot, varargin)
                             [handle.robots.frames(i).bodies ...
                             n_bodies + (1:numel(periph.bodies))];
             end
-
+            n_bodies = n_bodies + numel(periph.bodies);
         end
     end
         
