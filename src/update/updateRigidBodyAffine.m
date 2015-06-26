@@ -1,4 +1,5 @@
 function handle = updateRigidBodyAffine(A, handle)
+    % UPDATERIGIDBODYAFFINE
     %
     % handle = updateRigidBodyAffine(A, handle)
     %
@@ -25,8 +26,10 @@ function handle = updateRigidBodyAffine(A, handle)
     
     for i=1:length(handle.bodies)
         V = get(handle.bodies(i),'Vertices');
-        dim = size(V);
-        V = V*A12' + ones(dim(1),1)*t12';
+        V = V*A12';
+        V(:,1) = V(:,1) + t12(1);
+        V(:,2) = V(:,2) + t12(2);
+        V(:,3) = V(:,3) + t12(3);
         set(handle.bodies(i),'Vertices',V);
     end
     handle.A = A;

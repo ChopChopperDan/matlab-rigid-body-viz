@@ -1,4 +1,5 @@
 function handle = updateRigidBody(R, t, handle)
+    % UPDATERIGIDBODY
     %
     % handle = updateRigidBody(R, t, handle)
     %
@@ -8,10 +9,12 @@ function handle = updateRigidBody(R, t, handle)
     %
     % returns updated structure
     
-    % As a safety precaution, make sure the updated handle is returned.
-    %   Breaks the system, otherwise.
+    % Make sure the updated handle is returned.
     if isempty(handle);  return;  end
-    if nargout ~= 1; error('Must have return value for handle'); end;
+    if nargout ~= 1 
+        error('updateRigidBody:no_return_value', ...
+                            'Must have return value for handle'); 
+    end
     
     % Determine local transformation
     R12 = R*handle.R';
@@ -19,8 +22,10 @@ function handle = updateRigidBody(R, t, handle)
     
     for i=1:length(handle.bodies)
         V = get(handle.bodies(i),'Vertices');
-        dim = size(V);
-        V = V*R12' + ones(dim(1),1)*t12';
+        V = V*R12';
+        V(:,1) = V(:,1) + t12(1);
+        V(:,2) = V(:,2) + t12(2);
+        V(:,3) = V(:,3) + t12(3);
         set(handle.bodies(i),'Vertices',V);
     end
     handle.R = R;

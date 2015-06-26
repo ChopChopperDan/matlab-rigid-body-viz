@@ -69,7 +69,8 @@ function handle = createCylinder(R0, t0, param, varargin)
         disp('    height, radius, radius2 -  for cone');
         disp('    height, radiusX, radiusY - for elliptic cylinder');
         disp('    height, radiusX, radiusY, radiusX2, radiusY2 - for elliptic cone');
-        error('Invalid Parameterization for cylinder');
+        error('createCylinder:invalid_param', ...
+                'Invalid Parameterization for cylinder');
     end
     
     % Vertices
@@ -85,30 +86,23 @@ function handle = createCylinder(R0, t0, param, varargin)
     % Faces
     
     % side faces
-    F1 = zeros(n,4);
+    F = NaN*ones(n+2,n);
     for i=1:n
-        F1(i,:) = [i mod(i,n)+1 n+mod(i,n)+1 n+i];
+        F(i,1:4) = [i mod(i,n)+1 n+mod(i,n)+1 n+i];
     end
     
     % end caps
-    F2 = [1:n;n+1:2*n];
+    F(n+1:n+2,:) = [1:n;n+1:2*n];
     
-    FV_sides.Vertices = V;
-    FV_sides.Faces = F1;
-    FV_caps.Vertices = V;
-    FV_caps.Faces = F2;
-    handle.bodies(1) = patch(FV_sides, 'FaceColor',fc, ...
-                                        'FaceAlpha',fa, ...
-                                        'LineWidth',lw, ...
-                                        'EdgeColor',ec, ...
-                                        'EdgeAlpha',ea);
-    handle.bodies(2) = patch(FV_caps, 'FaceColor',fc, ...
-                                        'FaceAlpha',fa, ...
-                                        'LineWidth',lw, ...
-                                        'EdgeColor',ec, ...
-                                        'EdgeAlpha',ea);
+    FV.Vertices = V;
+    FV.Faces = F;
+    handle.bodies(1) = patch(FV, 'FaceColor',fc, ...
+                                    'FaceAlpha',fa, ...
+                                    'LineWidth',lw, ...
+                                    'EdgeColor',ec, ...
+                                    'EdgeAlpha',ea);
     handle.R = eye(3);
     handle.t = [0;0;0];
     handle.A = eye(3);
-    handle.labels = {'sides','caps'};
+    handle.labels = {'sides'};
 end

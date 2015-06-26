@@ -46,23 +46,16 @@ function handle = createPrism(R0, t0, param, varargin)
     
     % Faces
     % side faces
-    F1 = zeros(n,4);
+    F = NaN*ones(n+2,n);
     for i=1:n
-        F1(i,:) = [i, mod(i,n)+1, n+mod(i,n)+1, n+i];
+        F(i,1:4) = [i, mod(i,n)+1, n+mod(i,n)+1, n+i];
     end
     % top and bottom faces
-    F2 = [1:n;n+1:2*n];
+    F(n+1:n+2,:) = [1:n;n+1:2*n];
     
-    FV_sides.Vertices = V;
-    FV_sides.Faces = F1;
-    FV_caps.Vertices = V;
-    FV_caps.Faces = F2;
-    handle.bodies(1) = patch(FV_sides, 'FaceColor',fc, ...
-                                        'FaceAlpha',fa, ...
-                                        'LineWidth',lw, ...
-                                        'EdgeColor',ec, ...
-                                        'EdgeAlpha',ea);
-    handle.bodies(2) = patch(FV_caps, 'FaceColor',fc, ...
+    FV.Vertices = V;
+    FV.Faces = F;
+    handle.bodies(1) = patch(FV, 'FaceColor',fc, ...
                                         'FaceAlpha',fa, ...
                                         'LineWidth',lw, ...
                                         'EdgeColor',ec, ...
