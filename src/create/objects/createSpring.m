@@ -23,11 +23,7 @@ function handle = createSpring(R0, t0, param, varargin)
     defaults = {[1;1;1], 1, 0.5, [0;0;0], 1};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
-    fc = opt_values{1};
-    fa = opt_values{2};
-    lw = opt_values{3};
-    ec = opt_values{4};
-    ea = opt_values{5};
+    props = [flags;opt_values];
     
     % Verify parameters are correct
     invalid = false;
@@ -67,35 +63,22 @@ function handle = createSpring(R0, t0, param, varargin)
     V = V*R0' + ones(length(V),1)*t0';
     
     % Faces
-    % side faces
-    F1 = zeros(n*n*nw,4);
+    F = NaN*ones(n*n*nw + 2,n);
     for i=1:nw
         for j=1:n
             for k=1:n
                 idx = (i-1)*n*n + (j-1)*n;
-                F1(idx+k,:) = [idx+k idx+mod(k,n)+1 ...
+                F(idx+k,1:4) = [idx+k idx+mod(k,n)+1 ...
                                 idx+n+mod(k,n)+1 idx+n+k];
             end
         end
     end
     % end caps
-    F2 = [1:n; n*n*nw+(1:n)];
+    F(end-1:end,:) = [1:n; n*n*nw+(1:n)];
     
     % generate handle
-    handle.bodies(1) = patch(struct('Faces',F1,'Vertices',V), ...
-                                    'FaceColor',fc, ...
-                                    'FaceAlpha',fa, ...
-                                    'LineWidth',lw, ...
-                                    'EdgeColor',ec, ...
-                                    'EdgeAlpha',ea);
-    handle.bodies(2) = patch(struct('Faces',F2,'Vertices',V), ...
-                                    'FaceColor',fc, ...
-                                    'FaceAlpha',fa, ...
-                                    'LineWidth',lw, ...
-                                    'EdgeColor',ec, ...
-                                    'EdgeAlpha',ea);
-    handle.R = eye(3);
-    handle.t = [0;0;0];
-    handle.A = eye(3);
-    handle.labels = {'sides', 'caps'};
+    FV = struct('Faces',F,'Vertices',V);
+    handle = createEmptyBody();
+    handle.bodies = patch(FV, props{:});
+    handle.labels = {'sides'};
 end

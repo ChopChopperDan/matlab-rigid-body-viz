@@ -45,6 +45,8 @@ function create_const = defineiRobotCreate(varargin)
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);
     
+    create_const = defineEmptyRobot();
+    
     % Name
     create_const.name = 'create';
     

@@ -9,13 +9,11 @@
 clear variables; close all;
 
 % Define body
-cyl_param.radius = 0.1;
-cyl_param.height = 0.3;
+cyl_param = struct('radius', 0.1, 'height', 0.3);
 cyl_props = {'FaceColor',[0;1;1],'FaceAlpha',0.5};
 
 % Define 3d-frame
-frame_param.scale = 0.15;
-frame_param.width = 0.02;
+frame_param = struct('scale', 0.15, 'width', 0.02);
 
 % Cylinder is defined with its long axis along z.  This rotation will place
 % that axis along the x axis
@@ -26,15 +24,14 @@ p0 = [0;0.3;0.1];
 figure(1);
 cyl = createCylinder(R0,[0;0;0],cyl_param,cyl_props{:});
 % Attach 3D Frame to cylinder
-frame = create3DFrame(R0,[0;0;0],frame_param);
-cyl = combineRigidBodies(cyl, frame);
+cyl = combineRigidBodies(cyl, create3DFrame(R0,[0;0;0],frame_param));
 % Place in initial position
 cyl = updateRigidBody(eye(3),p0,cyl);
 axis equal; axis([-1 1 -1 1 0 1]); grid on;
 
 %% Animate rolling across floor
 
-% time stepping of animation
+% time sequence
 T = 4; dt = 0.02;
 t = 0:dt:T;
 

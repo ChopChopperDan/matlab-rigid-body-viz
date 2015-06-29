@@ -1,18 +1,16 @@
-function handle = createRobot(R0, t0, robot, varargin)
+function handle = createRobot(robot, varargin)
     % CREATEROBOT 
     %
-    % handle = createRobot(R0, t0, robot, ...)
+    % handle = createRobot(robot, ...)
     %
     % purpose: creates a robot drawing object in zero configuration
     %
     % input:
-    % R0 is 3 x 3 matrix for orientation of the base frame of the robot
-    % t0 is 3 x 1 vector for base frame of the robot
     % standard robot definition struct with fields:
     %   name: string denoting the name of the robot
     %   kin:
     %       H: [ h_1 h_2 ... h_n ] actuation axis for each joint
-    %       P: [ p_{0,1} p_{1,2} .. p_{n-1,n} p_{n,T] inter-joint vectors
+    %       P: [ p_{O,1} p_{1,2} .. p_{n-1,n} p_{n,T] inter-joint vectors
     %       joint_type:     0 = rotational  
     %                       1 = prismatic 
     %                       2 = rotational (non-visible) 
@@ -28,8 +26,8 @@ function handle = createRobot(R0, t0, robot, varargin)
     %              param:   parameterization according to handle
     %              props:   visual properties
     %               ** If no link is to be drawn, leave handle empty **
-    %       [opt] frame: single struct describing coordinate frames
-    %       [opt] peripherals: arbitrary length struct array with fields
+    %       frame: single struct describing coordinate frames
+    %       peripherals: arbitrary length struct array with fields
     %              id:      string id for peripheral
     %              frame:   frame index this peripheral is attached to
     %              handle:  function handle to object / primitive
@@ -62,40 +60,29 @@ function handle = createRobot(R0, t0, robot, varargin)
     
     % Initialize components so that structure can be treated as a 'rigid
     % body' in other functions.
-    handle.bodies = [];
-    handle.labels = {};
-    handle.R = eye(3);
-    handle.A = eye(3);
-    handle.t = [0;0;0];
+    handle = createEmptyBody();
+    % Build structure for 'robots' field within the rigid body and set
+    % initial values / placeholders
+    handle.robots = struct( ...
+            'name',      robot.name, ...
+            'kin',       robot.kin, ...
+            'frames',    struct('bodies',[],'R',eye(3),'t',[0;0;0]), ...
+            'base',      struct('bodies',[],'R',eye(3),'t',[0;0;0]), ...
+            'load',      [], ...
+            'left',      'root', ...
+            'right',     {{}});
     
-    % set name of robot
-    handle.robots.name = robot.name;
-    
-    
-    % Transform kinematics into desired coordinate system (these terms
-    %       should be constant)
-    handle.robots.kin.H = R0*robot.kin.H;
-    handle.robots.kin.P = R0*robot.kin.P;
-    handle.robots.kin.P(:,1) = handle.robots.kin.P(:,1) + t0;
-    handle.robots.kin.joint_type = robot.kin.joint_type;
+    % Add field in the kinematics field to store the current state and
+    % initialize to all zeros
     handle.robots.kin.state = zeros(size(robot.kin.joint_type));
-    
-    % Placeholders for frame and load information
-    handle.robots.frames = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
-    handle.robots.base = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
-    handle.robots.load = [];
-    
-    % Default placeholders for branching information
-    handle.robots.left = 'root';
-    handle.robots.right = {};
     
     % Counter for the number of bodies
     n_bodies = 0;
     
-    % Create link p_01
+    % Create link p_{O,1} and attach to base
     if ~isempty(robot.vis.links(1).handle)
-        Ri = R0*robot.vis.links(1).R;
-        ti = t0 + R0*robot.vis.links(1).t;
+        Ri = robot.vis.links(1).R;
+        ti = robot.vis.links(1).t;
         link = robot.vis.links(1).handle(Ri, ti, ...
                                     robot.vis.links(1).param, ...
                                     robot.vis.links(1).props{:});
@@ -116,7 +103,7 @@ function handle = createRobot(R0, t0, robot, varargin)
     % Pre-compute positions of all joint frames in zero pose
     P = cumsum(handle.robots.kin.P,2);
     p = P(:,1);
-    R = R0; 
+    R = eye(3); 
     
     % Fill the terms relating bodies to each frame within the robot
     for i=1:length(handle.robots.kin.joint_type)
@@ -237,48 +224,46 @@ function handle = createRobot(R0, t0, robot, varargin)
         n_bodies = n_bodies + numel(frame.bodies);
     end
     
-    % If peripherals part of constants file, attach to robot
-    if isfield(robot.vis,'peripherals')
-        for n = 1:numel(robot.vis.peripherals)
-            % Get relative coordinate frame for peripheral to attach to
-            if isnumeric(robot.vis.peripherals(n).frame)
-                i = robot.vis.peripherals(n).frame;
-                Ri = R0*handle.robots.frames(i).R;
-                ti = handle.robots.frames(i).t;
-            elseif strcmp(robot.vis.peripherals(n).frame,'tool')
-                i = nj + 1;
-                Ri = R0*handle.robots.frames(i).R;
-                ti = handle.robots.frames(i).t;
-            elseif strcmp(robot.vis.peripherals(n).frame,'base')
-                i = 0;
-                Ri = R0;
-                ti = t0;
-            end
-
-            Rp = Ri*robot.vis.peripherals(n).R;
-            tp = ti + Ri*robot.vis.peripherals(n).t;
-
-            periph = robot.vis.peripherals(n).handle(Rp, tp, ...
-                                robot.vis.peripherals(n).param, ...
-                                robot.vis.peripherals(n).props{:});
-            % Add bodies/labels to master list
-            periph_name = [handle.robots.name '_' ...
-                            robot.vis.peripherals(n).id '_'];
-            handle.bodies = [handle.bodies periph.bodies];
-            handle.labels = [handle.labels ...
-                        attachPrefix(periph_name, periph.labels)];
-            % Add pointers to body indices in the frame subfield
-            if i == 0
-                handle.robots.base.bodies = ...
-                            [handle.robots.base.bodies ...
-                            n_bodies + (1:numel(periph.bodies))];
-            else
-                handle.robots.frames(i).bodies = ...
-                            [handle.robots.frames(i).bodies ...
-                            n_bodies + (1:numel(periph.bodies))];
-            end
-            n_bodies = n_bodies + numel(periph.bodies);
+    % Attach peripherals to robot in prescribed position
+    for n = 1:numel(robot.vis.peripherals)
+        % Get relative coordinate frame for peripheral to attach to
+        if isnumeric(robot.vis.peripherals(n).frame)
+            i = robot.vis.peripherals(n).frame;
+            Ri = handle.robots.frames(i).R;
+            ti = handle.robots.frames(i).t;
+        elseif strcmp(robot.vis.peripherals(n).frame,'tool')
+            i = nj + 1;
+            Ri = handle.robots.frames(i).R;
+            ti = handle.robots.frames(i).t;
+        elseif strcmp(robot.vis.peripherals(n).frame,'base')
+            i = 0;
+            Ri = eye(3);
+            ti = [0;0;0];
         end
+
+        Rp = Ri*robot.vis.peripherals(n).R;
+        tp = ti + Ri*robot.vis.peripherals(n).t;
+
+        periph = robot.vis.peripherals(n).handle(Rp, tp, ...
+                            robot.vis.peripherals(n).param, ...
+                            robot.vis.peripherals(n).props{:});
+        % Add bodies/labels to master list
+        periph_name = [handle.robots.name '_' ...
+                        robot.vis.peripherals(n).id '_'];
+        handle.bodies = [handle.bodies periph.bodies];
+        handle.labels = [handle.labels ...
+                    attachPrefix(periph_name, periph.labels)];
+        % Add pointers to body indices in the frame subfield
+        if i == 0
+            handle.robots.base.bodies = ...
+                        [handle.robots.base.bodies ...
+                        n_bodies + (1:numel(periph.bodies))];
+        else
+            handle.robots.frames(i).bodies = ...
+                        [handle.robots.frames(i).bodies ...
+                        n_bodies + (1:numel(periph.bodies))];
+        end
+        n_bodies = n_bodies + numel(periph.bodies);
     end
         
 end

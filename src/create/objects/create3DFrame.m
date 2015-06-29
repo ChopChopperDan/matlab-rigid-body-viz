@@ -22,8 +22,7 @@ function handle = create3DFrame(R0, t0, param, varargin)
     defaults = {1, 0};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
-    fa = opt_values{1};
-    ea = opt_values{2};
+    props = [flags;opt_values];
     
     axis_param.radius = param.width/2;
     axis_param.height = param.scale;
@@ -36,25 +35,13 @@ function handle = create3DFrame(R0, t0, param, varargin)
     Rz = R0;
     tz = t0 + Rz*[0;0;h/2];
     
-    h_x = createCylinder(Rx,tx,axis_param, ...
-                                'FaceColor',[1;0;0], ...
-                                'FaceAlpha', fa, ...
-                                'EdgeAlpha', ea);
-	h_y = createCylinder(Ry,ty,axis_param, ...
-                                'FaceColor',[0;1;0], ...
-                                'FaceAlpha', fa, ...
-                                'EdgeAlpha', ea);
-	h_z = createCylinder(Rz,tz,axis_param, ...
-                                'FaceColor',[0;0;1], ...
-                                'FaceAlpha', fa, ...
-                                'EdgeAlpha', ea);
+    h_x = createCylinder(Rx,tx,axis_param, 'FaceColor',[1;0;0], props{:});
+	h_y = createCylinder(Ry,ty,axis_param, 'FaceColor',[0;1;0], props{:});
+	h_z = createCylinder(Rz,tz,axis_param, 'FaceColor',[0;0;1], props{:});
     
-    h_x.labels = attachPrefix('X_',h_x.labels);
-    h_y.labels = attachPrefix('Y_',h_y.labels);
-    h_z.labels = attachPrefix('Z_',h_z.labels);
+    h_x.labels = attachPrefix('frame_X_',h_x.labels);
+    h_y.labels = attachPrefix('frame_Y_',h_y.labels);
+    h_z.labels = attachPrefix('frame_Z_',h_z.labels);
     handle = combineRigidBodies(h_x,h_y,h_z);
-    handle.R = eye(3);
-    handle.t = [0;0;0];
-    handle.A = eye(3);
 end
     

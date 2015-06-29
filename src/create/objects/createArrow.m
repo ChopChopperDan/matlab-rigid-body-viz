@@ -48,14 +48,10 @@ function handle = createArrow(R0, t0, param, varargin)
     
     shaft = createCylinder(R0,t_shaft,shaft_param,arrow_props{:});
     head = createCylinder(R0,t_head,head_param,arrow_props{:});
-    shaft.labels = attachPrefix('shaft_',shaft.labels);
-    head.labels = attachPrefix('head_',head.labels);
+    shaft.labels = attachPrefix('arrow_shaft_',shaft.labels);
+    head.labels = attachPrefix('arrow_head_',head.labels);
     
     handle = combineRigidBodies(shaft,head);
-    
-    handle.R = eye(3);
-    handle.t = t0;
-    handle.A = eye(3);
 end
     
     

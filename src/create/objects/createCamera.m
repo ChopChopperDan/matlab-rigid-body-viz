@@ -11,12 +11,6 @@ function handle = createCamera(R0, t0, param, varargin)
     % Additional parameters include:
     %       'Color':    default: [0;0;0]
     %
-    % Depends on the following drawing package files:
-    %       createCuboid.m
-    %       createCylinder.m
-    %       attachPrefix.m
-    %       combineRigidBodies.m
-    %
     % See Also CREATECUBOID, CREATECYLINDER
     %
     % returns handle to drawing structure
@@ -40,6 +34,4 @@ function handle = createCamera(R0, t0, param, varargin)
     body.labels = attachPrefix('camera_body_', body.labels);
     lens.labels = attachPrefix('camera_lens_', lens.labels);
     handle = combineRigidBodies(body, lens);
-    handle.R = eye(3);
-    handle.t = t0;
 end

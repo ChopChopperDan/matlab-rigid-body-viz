@@ -55,12 +55,10 @@ function handle = createPrismaticJoint(R0, t0, param, varargin)
     body = createCuboid(R0, t0, body_param, body_props{:});
     slider = createCuboid(R0, t0, slider_param, slider_props{:});
     
-    handle.bodies = [body.bodies slider.bodies];
-    handle.labels = [attachPrefix('body_',body.labels) ...
-                        attachPrefix('slider_',slider.labels)];
-    handle.R = eye(3);
-    handle.t = [0;0;0];
-    handle.A = eye(3);
+    body.labels = attachPrefix('body_', body.labels);
+    slider.labels = attachPrefix('slider_', slider.labels);
+    
+    handle = combineRigidBodies(body, slider);
 end
     
     

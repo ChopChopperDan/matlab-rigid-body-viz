@@ -28,14 +28,14 @@ function combined_handle = combineRobots(handle1, handle2, name, varargin)
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
     hold_r2 = opt_values{1};
-    
+        
     % Combine associated bodies into same structure
     combined_handle.bodies = [handle1.bodies handle2.bodies];
     combined_handle.labels = [handle1.labels handle2.labels];
     % New combined handle retains coordinate system of handle1
     combined_handle.R = handle1.R;
-    combined_handle.A = handle1.A;
     combined_handle.t = handle1.t;
+    combined_handle.A = handle1.A;
     
     % offset for index references for bodies in master list
     nb1 = numel(handle1.bodies);
@@ -47,7 +47,7 @@ function combined_handle = combineRobots(handle1, handle2, name, varargin)
         pOT = handle1.t;
     else
         idx = strcmpi({handle1.robots.name},name);
-        if (idx == 0) 
+        if all(idx == 0) 
             error('combineRobots:name_not_found', ...
                             ['Cannot find robot named ' name]); 
         end
@@ -83,7 +83,7 @@ function combined_handle = combineRobots(handle1, handle2, name, varargin)
             
             % Add robot to right field of robot from handle1 if not
             %   attached to 'root'
-            if idx > 0
+            if any(idx > 0)
                 if iscellstr(handle1.robots(idx).right)
                     handle1.robots(idx).right = ...
                         [handle1.robots(idx).right handle2.robots(j).name];

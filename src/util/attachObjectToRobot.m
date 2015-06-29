@@ -14,7 +14,7 @@ function handle = attachObjectToRobot(object, frame, handle, name)
     % returns updated handle to robot structure
     
     idx = strcmpi({handle.robots.name},name);
-    if idx == 0 
+    if all(idx == 0)
         error('attachObjectToRobot:name_not_found', ...
                         ['No robot with name ' name]);
     end

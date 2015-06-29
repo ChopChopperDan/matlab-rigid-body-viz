@@ -60,9 +60,6 @@ function handle = createKinectV2(R0, t0, param, varargin)
     lens.labels = attachPrefix('KinectV2_lens_', lens.labels);
     
     handle = combineRigidBodies(base, lens);
-    handle.R = eye(3);
-    handle.t = [0;0;0];
-    handle.A = eye(3);
 end
     
     

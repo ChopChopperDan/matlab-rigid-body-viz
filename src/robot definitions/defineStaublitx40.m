@@ -1,7 +1,7 @@
-function tx40_const = defineStaublitx40(origin)
+function tx40_const = defineStaublitx40(varargin)
     %
     % tx40_const = defineStaublitx40()
-    % tx40_const = defineStaublitx40(origin) - allows additional optional
+    % tx40_const = defineStaublitx40(...) - allows additional optional
     %                                    parameters
     %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
     %
@@ -44,6 +44,8 @@ function tx40_const = defineStaublitx40(origin)
     
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);
+    
+    tx40_const = defineEmptyRobot();
     
     % Name
     tx40_const.name = 'tx40';

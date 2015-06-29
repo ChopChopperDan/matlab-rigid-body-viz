@@ -8,27 +8,37 @@
 
 clear variables; close all;
 
+[baxter_const, baxter_structure] = defineBaxter();
+
 figure(1);
-baxter = createBaxter(eye(3), [0;0;0], 'CreateFrames','off');
+baxter = createCombinedRobot(baxter_const, baxter_structure);
 axis equal;
 axis([-2 2 -2 2 -.85 1]);
 view([75 10]);
 
 %% Simple Animation
 
-t = 0:0.02:2;
+% Time sequence
+T = 2; dt = 0.02;
+t = 0:dt:T;
+
+% Pre-allocate angle structure
+q.names = {baxter_const.name};
+q.states = {zeros(7,1) zeros(7,1) 0};
 
 ql = zeros(7,1); % left arm joint angles
 qr = zeros(7,1); % right arm joint angles
 qh = 0; % head pan angle
 
-for k=1:length(t);    
+for k=1:length(t);
+    tic;
     ql(4) = pi/4*sin(2*pi*t(k)); % s1 in left arm
     qr(4) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
     qh(1) = sin(2*pi*t(k)); % head pan
     
-    q = {ql;qr;qh};
-    
-    baxter = updateRobot(q,baxter);
+    q.states = {ql qr qh};
+    baxter = updateRobot(q, baxter);
     drawnow;
+    t1 = toc;
+    while t1 < dt,   t1 = toc; end
 end

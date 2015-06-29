@@ -27,11 +27,7 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     defaults = {[1;1;1], 1, 0.5, [0;0;0], 1};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
-    fc = opt_values{1};
-    fa = opt_values{2};
-    lw = opt_values{3};
-    ec = opt_values{4};
-    ea = opt_values{5};
+    props = [flags;opt_values];
     
     % Verify parameters are correct
     if isfield(param,'radius')
@@ -78,14 +74,11 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     
     FV.Vertices = V;
     FV.Faces = F;
-    handle.bodies(1) = patch(FV, 'FaceColor',fc, ...
-                                    'FaceAlpha',fa, ...
-                                    'LineWidth',lw, ...
-                                    'EdgeColor',ec, ...
-                                    'EdgeAlpha',ea);
-    handle.R = eye(3);
-    handle.t = [0;0;0];
-    handle.A = eye(3);
+    
+    % To make sure the handle fields are created in a consistent order
+    handle = createEmptyBody();
+    
+    handle.bodies = patch(FV, props{:});
     handle.labels = {'sides'};
 end
     
