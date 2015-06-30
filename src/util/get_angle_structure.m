@@ -17,6 +17,6 @@ function theta = get_angle_structure(handle)
     theta = struct('name',cell(1,n), 'state', cell(1,n));
     for i=1:n
         theta(i).name = handle.robots(i).name;
-        theta(i).state = zeros(numel(handle.robots(i).kin.joint_type),1);
+        theta(i).state = zeros(1,numel(handle.robots(i).kin.joint_type));
     end
 end

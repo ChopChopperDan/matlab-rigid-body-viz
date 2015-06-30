@@ -70,7 +70,7 @@ function handle = updateSingleRobot(theta, handle, name)
     % Extract relevant information from theta and update base frame
     theta_idx = strcmpi({theta.name},name);
     if ~any(theta_idx ~= 0) || ...
-            ~any(theta(theta_idx).state ~= robot.kin.state(:))
+            ~any(theta(theta_idx).state(:) ~= robot.kin.state(:))
         % If name isn't found in theta as a robot to update, or
         %   passed states match the current state, then
         %   treat the entire robot as a rigid body with respect to

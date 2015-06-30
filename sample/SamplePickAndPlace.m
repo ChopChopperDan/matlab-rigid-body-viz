@@ -60,14 +60,14 @@ q = get_angle_structure(h_robot);
 
 % pre-defined robot motion
 t = 0:dt:1;
-q_arm = zeros(6, numel(t));
-q_arm(2,:) = -80*pi/180*t;
-q_arm(3,:) = -80*pi/180*t;
+q_arm = zeros(numel(t), 6);
+q_arm(:,2) = -80*pi/180*t;
+q_arm(:,3) = -80*pi/180*t;
 
 % Move robot end effector towards object
 for k=1:length(t)
     tic;
-    q(1).state = q_arm(:,k);
+    q(1).state = q_arm(k,:);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -93,14 +93,14 @@ pause(5*dt);
 
 % pre-defined robot motion
 t = 0:dt:2;
-q_arm = zeros(6, numel(t));
-q_arm(2,:) = -80*pi/180*(t(end)/2 - t);
-q_arm(3,:) = -80*pi/180*(t(end)/2 - t);
+q_arm = zeros(numel(t), 6);
+q_arm(:,2) = -80*pi/180*(t(end)/2 - t);
+q_arm(:,3) = -80*pi/180*(t(end)/2 - t);
 
 % move robot to desired new location
 for k=1:length(t)
     tic;
-    q(1).state = q_arm(:,k);
+    q(1).state = q_arm(k,:);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -125,13 +125,13 @@ pause(5*dt);
 
 % return robot to zero position
 t = 0:dt:1;
-q_arm = zeros(6, numel(t));
-q_arm(2,:) = 80*pi/180*(1 - t/t(end));
-q_arm(3,:) = 80*pi/180*(1 - t/t(end));
+q_arm = zeros(numel(t), 6);
+q_arm(:,2) = 80*pi/180*(1 - t/t(end));
+q_arm(:,3) = 80*pi/180*(1 - t/t(end));
 
 for k=1:length(t)
     tic;
-    q(1).state = q_arm(:,k);
+    q(1).state = q_arm(k,:);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
