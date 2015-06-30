@@ -71,10 +71,8 @@ sample_robot(1).vis.links(3).t = 0.75*x0;
 sample_robot(1).vis.links(3).param = struct('radius', 0.1, 'height', 0.5);
 sample_robot(1).vis.links(3).props = {}; % Keep shape defaults
 
-% Define frames
+% Define dimensions of coordinate frame
 sample_robot(1).vis.frame = struct('scale', 0.4, 'width', 0.05);
-
-
 
 %%% Define structure for full combined robot
 simple_robot_structure = defineEmptyRobotStructure(3);
@@ -84,6 +82,7 @@ simple_robot_structure(2).left = sample_robot(1).name;
 
 simple_robot_structure(3).name = sample_robot.name;
 simple_robot_structure(3).right = {gripper_const.name};
+[simple_robot_structure.create_properties] = deal({'CreateFrames','on'});
 
 % Finally create full robot with both arm and gripper combined into a
 % single robot structure
@@ -98,23 +97,24 @@ view([0 90]);
 %% Animate robot with joint displacements
 
 % Time sequence
-T = 5; dt = 0.01;
+T = 5; dt = 0.04;
 t = 0:dt:T;
 
 % Pre-allocate angle structure
-q.names = {h_sample_robot.robots.name};
-q.states = {[0;0], 0, 0};
+q = get_angle_structure(h_sample_robot);
 
 % Define paths for each actuator
 q1 = sample_robot(1).limit.upper_joint_limit(1) * t/T;
 q2 = sample_robot(1).limit.upper_joint_limit(2) * (1 - cos(2*pi*t/T))/2;
-qg = sample_robot(2).limit.upper_joint_limit * [t(1:(end-1)/2)/(T/2) ...
-                                            (1 - t(1:(end+1)/2)/(T/2))];
+qg = sample_robot(2).limit.upper_joint_limit * [t(1:end/2)/(T/2) ...
+                                            (1 - t(1:end/2)/(T/2))];
 
 % Step through time sequence and update robot at each time instance
 for k=1:length(t)
     tic;
-    q.states = {[q1(k);q2(k)] qg(k) qg(k)};
+    q(1).state = [q1(k);q2(k)];
+    q(2).state = qg(k);
+    q(3).state = qg(k);
     h_sample_robot = updateRobot(q,h_sample_robot);
     drawnow;
     t1 = toc;

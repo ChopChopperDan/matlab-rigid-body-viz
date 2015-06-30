@@ -33,6 +33,7 @@ function [gripper_const, gripper_structure] = ...
     %   -> vis
     %       -> joints      :  [1 x 1] struct array of joint definitions
     %       -> links       :  [2 x 1] struct array of link definitions
+    %       -> frame       :  struct for 3D coordinate frame parameter
     %
     % see also CREATECOMBINEDROBOT
     
@@ -117,6 +118,9 @@ function [gripper_const, gripper_structure] = ...
     gripper_const(1).vis.links(2).param = jaw_param;
     gripper_const(1).vis.links(2).props = link_props;
     
+    gripper_const(1).vis.frame = struct('scale', jaw_param.height/2, ...
+                                        'width', jaw_param.width/2);
+    
     % right jaw    
     gripper_const(2).vis.links(2).handle = @createCuboid;
     gripper_const(2).vis.links(2).R = R0;
@@ -124,6 +128,9 @@ function [gripper_const, gripper_structure] = ...
                                         jaw_param.height/2];
     gripper_const(2).vis.links(2).param = jaw_param;
     gripper_const(2).vis.links(2).props = link_props;
+    
+    gripper_const(2).vis.frame = struct('scale', jaw_param.height/2, ...
+                                        'width', jaw_param.width/2);
     
     % Define basic structure with both jaws attached to the root of the
     %   robot in parallel

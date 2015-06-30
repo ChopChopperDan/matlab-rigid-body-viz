@@ -2,16 +2,14 @@ function handle = updateRobot(theta, handle)
     %
     % handle = updateRobot(theta, handle)
     %
-    % theta is a structure containing the actuator displacements for all
-    %       robots that need updating.  The fields must have the form
+    % theta is a struct array containing the actuator displacements for all
+    %       robots that need updating.  **Does not need to be every robot
+    %       defined with the robot structure**
+    %
+    %       Must have the form
     %   root
-    %       -> names    : cell string array containing each robot to be
-    %                       updated **Does not need to be every robot
-    %                       defined with the robot structure**
-    %                       {'robot 1', 'robot 2', ... , 'robot n'}
-    %       -> states   : cell array containing the displacements for each
-    %                       robot named in the 'names' field.
-    %                       {theta_1, theta_2, ... , theta_n}
+    %       -> name    : string id for the robot to update 
+    %       -> state   : vector containing the updated state for the robot
     %                       
     % handle is the robot drawing structure that needs updating.  Returns
     %       the updated structure.
@@ -22,17 +20,9 @@ function handle = updateRobot(theta, handle)
     % see also UPDATERIGIDBODY CREATEROBOT
     
     % check correctness of theta input
-    if ~isfield(theta,'names') || ~isfield(theta,'states')
+    if ~isfield(theta,'name') || ~isfield(theta,'state')
         error('updateRobot:incorrect_struct', ...
-                    'theta must have fields "names" and "states"');  
-    end
-    if ~iscellstr(theta.names) || ~iscell(theta.states)
-        error('updateRobot:incorrect_field_types', ...
-                    '"names", "states" must be cell arrays');
-    end
-    if numel(theta.names) ~= numel(theta.states)
-        error('updateRobot:incorrect_theta_dimensions', ...
-                'theta fields "names" and "states" must be equal size');
+                    'theta must have fields "name" and "state"');  
     end
     
     for i=1:numel(handle.robots)
@@ -78,9 +68,9 @@ function handle = updateSingleRobot(theta, handle, name)
     body = struct('bodies',[],'R',eye(3),'t',[0;0;0]);
         
     % Extract relevant information from theta and update base frame
-    theta_idx = strcmpi(theta.names,name);
+    theta_idx = strcmpi({theta.name},name);
     if ~any(theta_idx ~= 0) || ...
-            ~any(theta.states{theta_idx}(:) ~= robot.kin.state(:))
+            ~any(theta(theta_idx).state ~= robot.kin.state(:))
         % If name isn't found in theta as a robot to update, or
         %   passed states match the current state, then
         %   treat the entire robot as a rigid body with respect to
@@ -102,7 +92,7 @@ function handle = updateSingleRobot(theta, handle, name)
         handle.robots(idx).base.t = ti;
     else
         % If name is found, then need to compute forward kinematics
-        q = theta.states{theta_idx};
+        q = theta(theta_idx).state;
         
         body.bodies = handle.bodies(robot.base.bodies);
         body.R = Rb;

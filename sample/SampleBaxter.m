@@ -23,20 +23,15 @@ T = 2; dt = 0.02;
 t = 0:dt:T;
 
 % Pre-allocate angle structure
-q.names = {baxter_const.name};
-q.states = {zeros(7,1) zeros(7,1) 0};
-
-ql = zeros(7,1); % left arm joint angles
-qr = zeros(7,1); % right arm joint angles
-qh = 0; % head pan angle
+% Expecting in order of left arm, right arm, and head
+q = get_angle_structure(baxter);
 
 for k=1:length(t);
     tic;
-    ql(4) = pi/4*sin(2*pi*t(k)); % s1 in left arm
-    qr(4) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
-    qh(1) = sin(2*pi*t(k)); % head pan
+    q(1).state(4) = pi/4*sin(2*pi*t(k)); % s1 in left arm
+    q(2).state(4) = -pi/4*sin(2*pi*t(k)); % s1 in right arm
+    q(3).state(1) = sin(2*pi*t(k)); % head pan
     
-    q.states = {ql qr qh};
     baxter = updateRobot(q, baxter);
     drawnow;
     t1 = toc;

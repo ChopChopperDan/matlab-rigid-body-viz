@@ -56,8 +56,7 @@ h_load.labels = attachPrefix('load_', h_load.labels);
 dt = 0.01;
 
 % actuator structure
-q.names = {h_robot.robots.name};
-q.states = {zeros(6,1), 0, 0};
+q = get_angle_structure(h_robot);
 
 % pre-defined robot motion
 t = 0:dt:1;
@@ -68,7 +67,7 @@ q_arm(3,:) = -80*pi/180*t;
 % Move robot end effector towards object
 for k=1:length(t)
     tic;
-    q.states{1} = q_arm(:,k);
+    q(1).state = q_arm(:,k);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -82,8 +81,7 @@ t = 0:dt:0.2;
 qg = 1/2*(gripper_param.aperture - 2*load_param.radius)*t/t(end);
 for k=1:length(t)
     tic;
-    q.states{2} = qg(k);
-    q.states{3} = qg(k);
+    [q(2:3).state] = deal(qg(k));
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -102,7 +100,7 @@ q_arm(3,:) = -80*pi/180*(t(end)/2 - t);
 % move robot to desired new location
 for k=1:length(t)
     tic;
-    q.states{1} = q_arm(:,k);
+    q(1).state = q_arm(:,k);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -115,8 +113,7 @@ t = 0:dt:0.2;
 qg = 1/2*(gripper_param.aperture - 2*load_param.radius)*(1 - t/t(end));
 for k=1:length(t)
     tic;
-    q.states{2} = qg(k);
-    q.states{3} = qg(k);
+    [q(2:3).state] = deal(qg(k));
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
@@ -134,7 +131,7 @@ q_arm(3,:) = 80*pi/180*(1 - t/t(end));
 
 for k=1:length(t)
     tic;
-    q.states{1} = q_arm(:,k);
+    q(1).state = q_arm(:,k);
     h_robot = updateRobot(q,h_robot);
     drawnow;
     t1 = toc;
