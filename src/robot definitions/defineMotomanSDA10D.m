@@ -51,10 +51,9 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     % Grab standard robot structure
     sda10d_const = defineEmptyRobot(3);
     
-    %%% Torso joint
-    sda10d_const(1)
-    
+    %%% Torso joint    
     sda10d_const(1).name = 'sda10d_torso';
+    
     % Kinematics
     sda10d_const(1).kin.H = R0*z0;
     sda10d_const(1).kin.P = R0*[0.9*z0 zed];
