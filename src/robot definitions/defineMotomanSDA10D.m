@@ -96,7 +96,7 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     sda10d_const(2).kin.P = R0*[[-0.05;-.1;.3] -.215*x0 ...
                         zed -.36*x0 .36*z0 zed .155*z0 zed];
     sda10d_const(2).kin.P(:,1) = t0 + sda10d_const(2).kin.P(:,1);
-    sda10d_const(2).kin.joint_type = zeros(7,1);
+    sda10d_const(2).kin.joint_type = zeros(1,7);
     
     % Limits
     sda10d_const(2).limit.upper_joint_limit = upper_joint_limit;
@@ -153,7 +153,7 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     sda10d_const(3).kin.P = R0*[[0.05;-.1;.3] .215*x0 ...
                         zed .36*x0 .36*z0 zed .155*z0 zed];
     sda10d_const(3).kin.P(:,1) = t0 + sda10d_const(3).kin.P(:,1);
-    sda10d_const(3).kin.joint_type = zeros(7,1);
+    sda10d_const(3).kin.joint_type = zeros(1,7);
     
     % Limits
     sda10d_const(3).limit.upper_joint_limit = upper_joint_limit;
