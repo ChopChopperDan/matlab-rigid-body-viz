@@ -8,6 +8,7 @@ function dst_handle = createRigidBodyCopy(src_handle)
     %   pose as the source object
     
     % these terms can be directly copied
+    dst_handle = createEmptyBody();
     dst_handle.R = src_handle.R;
     dst_handle.t = src_handle.t;
     dst_handle.A = src_handle.A;
@@ -16,14 +17,16 @@ function dst_handle = createRigidBodyCopy(src_handle)
     nb = length(src_handle.bodies);
     dst_handle.bodies = zeros(1,nb);
     
-    data = {'XData','YData','ZData'};
+    data = {'Faces', 'Vertices'};
     props = {'FaceColor', 'FaceAlpha','EdgeColor','EdgeAlpha','LineWidth'};
     
+    
+    
     for i=1:nb
-        XYZ = get(src_handle.bodies(i),data);
+        src_data = get(src_handle.bodies(i),data);
+        [FV.Faces, FV.Vertices] = src_data{:};
         src_props = get(src_handle.bodies(i),props);
-        dst_props = reshape([props;src_props],[1 10]);
-        dst_handle.bodies(i) = patch(XYZ{1},XYZ{2},XYZ{3},1);
-        set(dst_handle.bodies(i),dst_props{:});
+        dst_props = reshape([props;src_props],[1 2*numel(props)]);
+        dst_handle.bodies(i) = patch(FV,dst_props{:});
     end
 end
