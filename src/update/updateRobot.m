@@ -19,6 +19,12 @@ function handle = updateRobot(theta, handle)
     %
     % see also UPDATERIGIDBODY CREATEROBOT
     
+    % Make sure handle is requested as return value
+    if nargout < 1
+        error('updateRobot:no_return_value', ...
+                    'updateRobot must have return value');
+    end
+    
     % check correctness of theta input
     if ~isfield(theta,'name') || ~isfield(theta,'state')
         error('updateRobot:incorrect_struct', ...
