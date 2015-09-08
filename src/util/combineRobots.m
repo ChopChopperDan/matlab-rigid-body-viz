@@ -51,7 +51,8 @@ function combined_handle = combineRobots(handle1, handle2, name, varargin)
             error('combineRobots:name_not_found', ...
                             ['Cannot find robot named ' name]); 
         end
-        pOT = handle1.t + handle1.R*handle1.robots(idx).frames(end).t;
+        pOT = handle1.t + handle1.R*(handle1.robots(idx).base.t + ...
+            handle1.robots(idx).base.R*handle1.robots(idx).frames(end).t);
     end
     if strcmp(hold_r2,'off')
         handle2 = updateRigidBody(handle2.R, pOT, handle2);

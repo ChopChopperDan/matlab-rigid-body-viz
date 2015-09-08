@@ -113,7 +113,7 @@ function [gripper_const, gripper_structure] = ...
     % left jaw + palm
     gripper_const(1).vis.links(1).handle = @createCuboid;
     gripper_const(1).vis.links(1).R = R0;
-    gripper_const(1).vis.links(1).t = palm_param.height/2*R0*z0;
+    gripper_const(1).vis.links(1).t = t0 + palm_param.height/2*R0*z0;
     gripper_const(1).vis.links(1).param = palm_param;
     gripper_const(1).vis.links(1).props = link_props;
     
