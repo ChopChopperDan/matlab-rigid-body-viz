@@ -15,14 +15,15 @@ function [gripper_const, gripper_structure] = ...
     %
     %           'Color'     :   default [0;0;0]
     %           'Origin'    :   default [eye(3) [0;0;0]; [0 0 0] 1]
+    %           'Name'      :   default 'gripper'
     % 
     % returns:
     %       gripper_const - struct array for the two 'robots' that make up 
     %           a generic parallel-jaw gripper with the fields
     % 
     % root
-    %   -> name            : (1) 'gripper_left_jaw'
-    %                        (2) 'gripper right_jaw'
+    %   -> name            : (1) Name + '_left_jaw'
+    %                        (2) Name + '_right_jaw'
     %   -> kin
     %       -> H           : [3 x 1] joint axes
     %       -> P           : [3 x 2] inter-joint translation
@@ -37,12 +38,13 @@ function [gripper_const, gripper_structure] = ...
     %
     % see also CREATECOMBINEDROBOT
     
-    flags = {'Color','Origin'};
-    defaults = {[0;0;0], eye(4)};
+    flags = {'Color','Origin','Name'};
+    defaults = {[0;0;0], eye(4),'gripper'};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
     c = opt_values{1};
     origin = opt_values{2};
+    name = opt_values{3};
     
     % parse through param file
     if ~isfield(param,'fingerwidth')
@@ -68,8 +70,8 @@ function [gripper_const, gripper_structure] = ...
     % Grab standard robot structure
     gripper_const = defineEmptyRobot(2);
     
-    gripper_const(1).name = 'gripper_left_jaw';
-    gripper_const(2).name = 'gripper_right_jaw';
+    gripper_const(1).name = [name '_left_jaw'];
+    gripper_const(2).name = [name '_right_jaw'];
 
     % define gripper as two 1dof robots
     x0 = [1;0;0]; z0 = [0;0;1];

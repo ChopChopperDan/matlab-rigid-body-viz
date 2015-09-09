@@ -36,6 +36,10 @@ function handle = createCombinedRobot(robots, structure)
     % create all passed robots
     for i=1:n_r
         s_idx = strcmpi({structure.name}, robots(i).name);
+        if nnz(s_idx) > 1, 
+            error('createCombinedRobots:multiplenames', ...
+                'Make sure each robot has a distinct name');
+        end
         robot_handles(i) = createRobot(robots(i), ...
                             structure(s_idx).create_properties{:});
     end
