@@ -1,10 +1,16 @@
 function [baxter_const, baxter_structure] = defineBaxter(varargin)
+    % DEFINEBAXTER
     %
     % [baxter_const, baxter_structure] = defineBaxter()
     % [baxter_const, baxter_structure] = defineBaxter(...) 
     %                           allows additional optional parameters
     %       'Origin'        :   default [eye(3) [0;0;0]; [0 0 0] 1]
     %       'Pedestal'      :   'on'/'off' (default on)
+    %       'LeftGripper' / :   structure with creation options accepted by
+    %       'RightGripper'      baxterGripper as fields
+    %                               -> param 
+    %                               -> props
+    %                           default: no gripper attached
     %
     % define-file for the Rethink Robotics Baxter.  Returns struct array 
     %   with the following form:
@@ -31,17 +37,22 @@ function [baxter_const, baxter_structure] = defineBaxter(varargin)
     %                           (2) arm mount
     %                           (3) (sonar head, neck, [opt] pedestal)
     %
-    %   see also CREATEBAXTER 
+    % See also CREATEROBOT, CREATECOMBINEDROBOT, DEFINEBAXTERGRIPPER
     
     
     x0 = [1;0;0]; y0 = [0;1;0]; z0 = [0;0;1]; zed = [0;0;0];
     
-    flags = {'Origin', 'Pedestal'};
-    defaults = {[eye(3) zed; zed' 1], 'on'};
+    flags = {'Origin', 'Pedestal', 'LeftGripper', 'RightGripper'};
+    defaults = {[eye(3) zed; zed' 1], 'on', [], []};
     
     opt_values = mrbv_parse_input(varargin, flags, defaults);
     origin = opt_values{1};
     cp = opt_values{2};
+    left_gripper_options = opt_values{3};
+    right_gripper_options = opt_values{4};
+    
+    n_grippers = ~isempty(left_gripper_options) + ...
+                    ~isempty(right_gripper_options);
 
     R0 = origin(1:3,1:3);
     t0 = origin(1:3,4);
@@ -65,7 +76,7 @@ function [baxter_const, baxter_structure] = defineBaxter(varargin)
     arm_mount_param = struct('width',0.2,'length',0.15,'height',0.05);
     
     % Grab standard robot structure
-    baxter_const = defineEmptyRobot(3);
+    baxter_const = defineEmptyRobot(3 + 2*n_grippers);
     
     %%% Left Arm
     % Kinematic Constants
@@ -301,7 +312,45 @@ function [baxter_const, baxter_structure] = defineBaxter(varargin)
                             {'FaceColor', [0.4;0.4;0.4], 'EdgeAlpha', 1};
     end
     
-    %%% Define structure for combined robot.  All robots attached to root
-    baxter_structure = defineEmptyRobotStructure(3);
+    % Attach grippers if requested
+    if n_grippers > 0
+        grippers_const = defineEmptyRobot(2*n_grippers);
+        grippers_structure = defineEmptyRobotStructure(2*n_grippers);
+        if ~isempty(left_gripper_options)
+            Ogl = origin*[rot(z0,pi/4) zed; zed' 1];
+            [grippers_const(1:2), ...
+                grippers_structure(1:2)] = defineBaxterGripper(...
+                                        left_gripper_options.param, ...
+                                        left_gripper_options.props{:}, ...
+                                        'Origin', Ogl, ...
+                                        'Name', 'left_gripper');
+            [grippers_structure(1:2).left] = deal(baxter_const(1).name);
+        end
+        if ~isempty(right_gripper_options)
+            Ogr = origin*[rot(z0,-pi/4) zed; zed' 1];
+            [grippers_const(end-1:end), ...
+                grippers_structure(end-1:end)] = defineBaxterGripper(...
+                                        right_gripper_options.param, ...
+                                        right_gripper_options.props{:}, ...
+                                        'Origin', Ogr, ...
+                                        'Name', 'right_gripper');
+            [grippers_structure(end-1:end).left] = deal(baxter_const(2).name);
+        end
+        baxter_const(4:3+2*n_grippers) = grippers_const;
+    end
+        
+    
+    %%% Define structure for combined robot.  All baxter robots attached 
+    % to root, and, if defined, grippers are attached to arms
+    baxter_structure = defineEmptyRobotStructure(3 + n_grippers);
     [baxter_structure.name] = baxter_const.name;
+    if n_grippers > 0
+        baxter_structure(4:3+2*n_grippers) = grippers_structure;
+        if ~isempty(left_gripper_options)
+            baxter_structure(1).right = {grippers_structure(1:2).name};
+        end
+        if ~isempty(right_gripper_options)
+            baxter_structure(2).right = {grippers_structure(end-1:end).name};
+        end
+    end
 end

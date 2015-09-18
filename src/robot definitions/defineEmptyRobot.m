@@ -8,9 +8,10 @@ function empty_robot_const = defineEmptyRobot(n)
     % matlab-rigid-body-viz toolbox.  Will define 'n' robots with the
     % standard structure for a robot needed by createRobot
     %
-    % see also CREATEROBOT DEFINEEMPTYSTRUCTURE
+    % see also CREATEROBOT DEFINEEMPTYROBOTSTRUCTURE
     
     if nargin == 0, n = 1;  end
+    if n == 0, empty_robot_const = []; return; end
     
     % Base structure needs fields for name, kinematics, actuator limits, 
     %   and visualization constants.
