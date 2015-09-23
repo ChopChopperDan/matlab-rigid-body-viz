@@ -23,7 +23,7 @@ function handle = createCylinder(R0, t0, param, varargin)
     %
     % returns handle to drawing structure
     %
-    % see also CREATECUBOID CREATEELLLIPSOID CREATEPRISM
+    % see also CREATECUBOID CREATEELLIPSOID CREATEPRISM
     
     flags = {'FaceColor','FaceAlpha','LineWidth','EdgeColor','EdgeAlpha'};
     defaults = {[1;1;1], 1, 0.5, [0;0;0], 1};
