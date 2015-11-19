@@ -94,7 +94,7 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     % Kinematics
     sda10d_const(2).kin.H = R0*[x0 y0 x0 y0 z0 y0 z0];
     sda10d_const(2).kin.P = R0*[[-0.05;-.1;.3] -.215*x0 ...
-                        zed -.36*x0 .36*z0 zed .155*z0 zed];
+                        zed -.36*x0 .36*z0 zed .145*z0 0.01*z0];
     sda10d_const(2).kin.P(:,1) = t0 + sda10d_const(2).kin.P(:,1);
     sda10d_const(2).kin.joint_type = zeros(1,7);
     
@@ -139,9 +139,9 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     
     sda10d_const(2).vis.links(7).handle = @createCylinder;
     sda10d_const(2).vis.links(7).R = eye(3);
-    sda10d_const(2).vis.links(7).t = .0975*z0;
+    sda10d_const(2).vis.links(7).t = .0925*z0;
     sda10d_const(2).vis.links(7).param = struct('radius',0.045, ...
-                                                'height',0.095);
+                                                'height',0.085);
     sda10d_const(2).vis.links(7).props = link_props;
     
     sda10d_const(2).vis.frame = struct('scale',0.15,'width',0.01);
@@ -151,7 +151,7 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     % Kinematics
     sda10d_const(3).kin.H = R0*[x0 y0 x0 y0 z0 y0 z0];
     sda10d_const(3).kin.P = R0*[[0.05;-.1;.3] .215*x0 ...
-                        zed .36*x0 .36*z0 zed .155*z0 zed];
+                        zed .36*x0 .36*z0 zed .145*z0 0.01*z0];
     sda10d_const(3).kin.P(:,1) = t0 + sda10d_const(3).kin.P(:,1);
     sda10d_const(3).kin.joint_type = zeros(1,7);
     
@@ -196,9 +196,9 @@ function [sda10d_const, sda10d_structure] = defineMotomanSDA10D(varargin)
     
     sda10d_const(3).vis.links(7).handle = @createCylinder;
     sda10d_const(3).vis.links(7).R = eye(3);
-    sda10d_const(3).vis.links(7).t = .0975*z0;
+    sda10d_const(3).vis.links(7).t = .0925*z0;
     sda10d_const(3).vis.links(7).param = struct('radius',0.045, ...
-                                                'height',0.095);
+                                                'height',0.085);
     sda10d_const(3).vis.links(7).props = link_props;
     
     sda10d_const(3).vis.frame = struct('scale',0.15,'width',0.01);
