@@ -40,37 +40,29 @@ sample_robot(1).limit.upper_joint_limit = [2*pi 1];
 % Visualization constants
 
 % Define each joint visualization
-% struct array placeholder for all joints
-sample_robot(1).vis.joints = struct('param',cell(1,2),'props',cell(1,2));
+% struct array placeholder for the visualization of the robot arm, passing
+% '2' for the number of joints in the arm
+sample_robot(1).vis = defineEmptyRobotVis(2);
 
 % joint 1 is a revolute joint, define according to createCylinder
-sample_robot(1).vis.joints(1).param = struct('radius', 0.2, 'height', 0.4);
-sample_robot(1).vis.joints(1).props = {'FaceColor', [1;0;0]};
+sample_robot(1) = addVisJoint(sample_robot(1), 1, ...
+        struct('radius', 0.2, 'height', 0.4), {'FaceColor', [1;0;0]});
 
 % joint 2 is prismatic, define according to createPrismaticJoint
-sample_robot(1).vis.joints(2).param = struct('width', 0.3, ...
-                                            'length', 0.3, ...
-                                            'height', 1, ...
-                                            'sliderscale', 0.8);
-sample_robot(1).vis.joints(2).props = {}; % Keep shape defaults
+sample_robot(1) = addVisJoint(sample_robot(1), 2, ...
+    struct('width', 0.3, 'length', 0.3, 'height', 1, 'sliderscale', 0.8), ...
+    {});
 
-% Define each link visualization
-sample_robot(1).vis.links = struct('handle', cell(1,3), ...
-                                'R', cell(1,3), 't', cell(1,3), ...
-                                'param',cell(1,3),'props',cell(1,3));
+% Add link visualizations
 % Want both links to be cylinders
-sample_robot(1).vis.links(2).handle = @createCylinder;
-sample_robot(1).vis.links(2).R = rot(y0,pi/2);
-sample_robot(1).vis.links(2).t = 0.85*x0;
-sample_robot(1).vis.links(2).param = struct('radius', 0.2, 'height', 1.3);
-sample_robot(1).vis.links(2).props = {'FaceColor', [0;1;0],'EdgeAlpha', 0};
-
-sample_robot(1).vis.links(3).handle = @createCylinder;
-sample_robot(1).vis.links(3).R = rot(y0,pi/2);
-sample_robot(1).vis.links(3).t = 0.75*x0;
-sample_robot(1).vis.links(3).param = struct('radius', 0.1, 'height', 0.5);
-sample_robot(1).vis.links(3).props = {}; % Keep shape defaults
-
+sample_robot(1) = addVisLink(sample_robot(1), 1, ...
+                            @createCylinder, rot(y0,pi/2), 0.85*x0, ...
+                            struct('radius', 0.2, 'height', 1.3), ...
+                            {'FaceColor', [0;1;0],'EdgeAlpha', 0});
+sample_robot(1) = addVisLink(sample_robot(1), 2, ...
+                            @createCylinder, rot(y0,pi/2), 0.75*x0, ...
+                            struct('radius', 0.1, 'height', 0.5), ...
+                            {});
 % Define dimensions of coordinate frame
 sample_robot(1).vis.frame = struct('scale', 0.4, 'width', 0.05);
 
