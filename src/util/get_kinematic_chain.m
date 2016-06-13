@@ -1,8 +1,8 @@
-function [kin, chain] = get_kinematic_chain(handle, name_base, name_end)
+function [kin, chain] = get_kinematic_chain(const, structure, name_base, name_end)
     % GET_KINEMATIC_CHAIN
     % 
-    % kin = get_kinematic_chain(handle, name_base, name_end)
-    % [kin, chain] = get_kinematic_chain(handle, name_base, name_end)
+    % kin = get_kinematic_chain(const, structure, name_base, name_end)
+    % [kin, chain] = get_kinematic_chain(const, structure, name_base, name_end)
     %
     % computes the kinematic chain between the robots in handle that have
     % names 'name_base' and 'name_end'.
@@ -16,16 +16,22 @@ function [kin, chain] = get_kinematic_chain(handle, name_base, name_end)
     %       -> joint_type : n-vector of joint types
     %                       0 - rotational
     %                       1 - prismatic
-    %                       2 - mobile orientation
+    %                       2 - mobile rotation
     %                       3 - mobile translation
     %
     % chain returns a cell string containing the names of all robots in the
     % kinematic path between name_base and name_end
         
-    if all(strcmpi({handle.robots.name}, name_base) == 0) || ...
-            all(strcmpi({handle.robots.name}, name_end) == 0)
+    if all(strcmpi({const.name}, name_base) == 0) || ...
+            all(strcmpi({const.name}, name_end) == 0)
         error('get_kinematic_chain:name_not_found', ...
-                'Name could not be found in the robot handle');
+                'No robot constants found for provided robot names');
+    end
+    
+    if all(strcmpi({structure.name}, name_base) == 0) || ...
+            all(strcmpi({structure.name}, name_end) == 0)
+        error('get_kinematic_chain:name_not_found', ...
+                'No robot structure found for provided robot names');
     end
     
     kin = struct('H',[],'P',[0;0;0],'joint_type',[]);
@@ -34,9 +40,9 @@ function [kin, chain] = get_kinematic_chain(handle, name_base, name_end)
     name = name_end;
     
     % explore backwards from 'name_end' to find entire chain
-    for n=1:numel(handle.robots)
-        idx = strcmpi({handle.robots.name}, name);
-        kin_left = handle.robots(idx).kin;
+    for n=1:numel(const)
+        idx = strcmpi({const.name}, name);
+        kin_left = const(idx).kin;
                 
         kin.H = [kin_left.H kin.H];
         kin.P(:,1) = kin_left.P(:,end) + kin.P(:,1);
@@ -45,7 +51,7 @@ function [kin, chain] = get_kinematic_chain(handle, name_base, name_end)
         
         chain = [name chain];
         
-        name = handle.robots(idx).left;
+        name = structure(idx).left;
         
         if strcmpi(name, 'root')
             break;
