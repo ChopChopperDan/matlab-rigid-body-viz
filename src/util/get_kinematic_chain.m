@@ -51,11 +51,11 @@ function [kin, chain] = get_kinematic_chain(const, structure, name_base, name_en
         
         chain = [name chain];
         
-        name = structure(idx).left;
-        
-        if strcmpi(name, 'root')
-            break;
+        if strcmpi(name, name_base) || strcmpi(structure(idx).left, 'root')
+            break; 
         end
+        
+        name = structure(idx).left;
     end
     
     if all(strcmpi(chain, name_base) == 0)
