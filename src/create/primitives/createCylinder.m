@@ -84,11 +84,11 @@ function handle = createCylinder(R0, t0, param, varargin)
     % side faces
     F = NaN*ones(n+2,n);
     for i=1:n
-        F(i,1:4) = [i mod(i,n)+1 n+mod(i,n)+1 n+i];
+        F(i,1:4) = [n+i n+mod(i,n)+1 mod(i,n)+1 i];
     end
     
     % end caps
-    F(n+1:n+2,:) = [1:n;n+1:2*n];
+    F(n+1:n+2,:) = [1:n;2*n:-1:n+1];
     
     FV.Vertices = V;
     FV.Faces = F;
@@ -96,6 +96,6 @@ function handle = createCylinder(R0, t0, param, varargin)
     % To make sure the handle fields are created in a consistent order
     handle = createEmptyBody();
     
-    handle.bodies = patch(FV, props{:});
+    handle.bodies = patch(FV, props{:}, 'FaceNormals',calc_normals(FV));
     handle.labels = {'sides'};
 end

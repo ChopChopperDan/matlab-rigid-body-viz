@@ -64,11 +64,11 @@ function handle = createCuboid(R0, t0, param, varargin)
     
     % Faces
     F = [1 2 4 3; ... %-X
-         5 6 8 7; ... %+X
-         1 2 6 5; ... %-Y
+         7 8 6 5; ... %+X
+         5 6 2 1; ... %-Y
          3 4 8 7; ... %+Y
          1 3 7 5; ... %-Z
-         2 4 8 6];    %+Z
+         6 8 4 2];    %+Z
     
     FV.Vertices = V;
     FV.Faces = F;
@@ -76,6 +76,6 @@ function handle = createCuboid(R0, t0, param, varargin)
     % To make sure the handle fields are created in a consistent order
     handle = createEmptyBody();
     
-    handle.bodies = patch(FV, props{:});
+    handle.bodies = patch(FV, props{:}, 'FaceNormals',calc_normals(FV));
     handle.labels = {'sides'};
 end

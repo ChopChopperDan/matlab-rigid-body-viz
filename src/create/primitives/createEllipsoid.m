@@ -67,8 +67,8 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     F = zeros(n*n, 4);
     for i=1:n 
         for j=1:n
-            F((i-1)*n+j,:) = [(i-1)*n+j, (i-1)*n+mod(j,n)+1 ...
-                              i*n+mod(j,n)+1, i*n+j];
+            F((i-1)*n+j,:) = [i*n+j, i*n+mod(j,n)+1, ...
+                              (i-1)*n+mod(j,n)+1, (i-1)*n+j];
         end
     end
     
@@ -78,7 +78,7 @@ function handle = createEllipsoid(R0,t0,param,varargin)
     % To make sure the handle fields are created in a consistent order
     handle = createEmptyBody();
     
-    handle.bodies = patch(FV, props{:});
+    handle.bodies = patch(FV, props{:}, 'FaceNormals',calc_normals(FV));
     handle.labels = {'sides'};
 end
     
